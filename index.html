@@ -370,43 +370,6 @@
             font-size: 0.9em;
             margin-top: 10px;
         }
-        
-        .saved-cases {
-            background: #e7f3ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .saved-case-item {
-            background: white;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .saved-case-item:hover {
-            background: #f8f9fa;
-        }
-        
-        .case-info {
-            flex: 1;
-        }
-        
-        .case-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .small-btn {
-            padding: 5px 12px;
-            font-size: 0.85em;
-        }
 
         .alert-danger {
             background: #f8d7da;
@@ -818,12 +781,6 @@
         
         <!-- TAB FOLLOW-UP -->
         <div id="tab-followup" class="tab-content">
-            <div class="saved-cases" id="saved-cases-list">
-                <h3>📁 Casi Salvati</h3>
-                <p class="info-text">I casi vengono salvati localmente nel browser. Selezionane uno per il follow-up.</p>
-                <div id="cases-container"></div>
-            </div>
-            
             <div class="section">
                 <h2>📋 Dati Biopsia Precedente</h2>
                 
@@ -931,8 +888,6 @@
     </div>
 
     <script>
-        let savedCases = JSON.parse(localStorage.getItem('nmc-cases') || '[]');
-        
         function toggleKL() {
             const checkbox = document.getElementById('kl_performed');
             const select = document.getElementById('kappa_lambda');
@@ -975,7 +930,6 @@
             } else {
                 document.querySelectorAll('.tab')[1].classList.add('active');
                 document.getElementById('tab-followup').classList.add('active');
-                loadSavedCases();
             }
         }
         
@@ -1645,8 +1599,6 @@
             html += `<div class="report-text">${reportText}</div>`;
             html += `<button class="copy-btn" onclick="copyReport()">📋 Copia Referto</button>`;
             
-            html += `<button class="btn-success" style="margin-top: 15px; width: 100%;" onclick="saveCase()">💾 Salva Caso per Follow-up</button>`;
-            
             resultDiv.className = 'result show';
             resultDiv.style.background = '#f8f9fa';
             resultDiv.style.border = '2px solid #667eea';
@@ -1659,115 +1611,6 @@
             navigator.clipboard.writeText(reportText).then(() => {
                 alert('✅ Referto copiato negli appunti!');
             });
-        }
-        
-        function saveCase() {
-            const caseData = {
-                id: Date.now(),
-                date: new Date().toISOString().split('T')[0],
-                histology: {
-                    cellularity: document.getElementById('cellularity').value,
-                    cellularityPercent: document.getElementById('cellularity-percent').value,
-                    meRatio: document.getElementById('me_ratio').value,
-                    megakaryocyte: document.getElementById('megakaryocyte').value,
-                    proliferation: document.getElementById('proliferation').value,
-                    fibrosis: parseInt(document.getElementById('fibrosis').value),
-                    lymphoidPercent: document.getElementById('lymphoid-percent').value,
-                    lymphoidDistribution: document.getElementById('lymphoid-distribution').value
-                },
-                ihc: {
-                    cd34: document.getElementById('cd34').value,
-                    cd61: document.getElementById('cd61').value,
-                    cd3: document.getElementById('cd3').value,
-                    cd20: document.getElementById('cd20').value,
-                    perls: document.getElementById('perls').value
-                },
-                clinical: {
-                    age: document.getElementById('age').value,
-                    sex: document.getElementById('sex').value,
-                    diagnosis: document.getElementById('suspected-diagnosis').value || 'Non specificata'
-                }
-            };
-            
-            savedCases.push(caseData);
-            localStorage.setItem('nmc-cases', JSON.stringify(savedCases));
-            alert('✅ Caso salvato! Disponibile nella sezione Follow-up.');
-        }
-        
-        function loadSavedCases() {
-            const container = document.getElementById('cases-container');
-            
-            if (savedCases.length === 0) {
-                container.innerHTML = '<p style="color: #666; font-style: italic;">Nessun caso salvato</p>';
-                return;
-            }
-            
-            let html = '';
-            savedCases.forEach((c, index) => {
-                html += `<div class="saved-case-item">`;
-                html += `<div class="case-info">`;
-                html += `<strong>${c.date}</strong> - ${c.clinical.diagnosis} - MF-${c.histology.fibrosis}`;
-                
-                if (c.histology.cellularityPercent) {
-                    html += ` - Cell: ${c.histology.cellularityPercent}%`;
-                }
-                
-                html += `<br><small>Cellularità: ${c.histology.cellularity}, Megacariociti: ${c.histology.megakaryocyte}</small>`;
-                
-                if (c.histology.meRatio) {
-                    html += `<br><small>M/E: ${c.histology.meRatio}</small>`;
-                }
-                
-                if (c.histology.lymphoidPercent && parseFloat(c.histology.lymphoidPercent) > 20) {
-                    html += `<br><small style="color: #dc3545; font-weight: 600;">⚠️ Linfociti: ${c.histology.lymphoidPercent}%</small>`;
-                }
-                
-                if (c.ihc && (c.ihc.cd34 || c.ihc.cd61 || c.ihc.perls)) {
-                    html += `<br><small style="color: #667eea;">IHC: `;
-                    const ihcList = [];
-                    if (c.ihc.cd34) ihcList.push(`CD34 ${c.ihc.cd34}`);
-                    if (c.ihc.cd61) ihcList.push(`CD61 ${c.ihc.cd61}`);
-                    if (c.ihc.perls) ihcList.push(`Perls ${c.ihc.perls}`);
-                    html += ihcList.join(', ');
-                    html += `</small>`;
-                }
-                
-                html += `</div>`;
-                html += `<div class="case-actions">`;
-                html += `<button class="small-btn" onclick="loadCaseForFollowup(${index})">Carica</button>`;
-                html += `<button class="small-btn btn-secondary" onclick="deleteCase(${index})">Elimina</button>`;
-                html += `</div>`;
-                html += `</div>`;
-            });
-            
-            container.innerHTML = html;
-        }
-        
-        function loadCaseForFollowup(index) {
-            const caseData = savedCases[index];
-            
-            document.getElementById('prev-date').value = caseData.date;
-            document.getElementById('prev-diagnosis').value = caseData.clinical.diagnosis;
-            document.getElementById('prev-fibrosis').value = caseData.histology.fibrosis;
-            document.getElementById('prev-cellularity').value = caseData.histology.cellularity;
-            
-            let alertMessage = '✅ Caso caricato! Inserisci ora i dati della biopsia attuale.';
-            if (caseData.histology.cellularityPercent) {
-                alertMessage += `\n\nCellularità precedente: ${caseData.histology.cellularityPercent}%`;
-            }
-            if (caseData.histology.meRatio) {
-                alertMessage += `\nM/E precedente: ${caseData.histology.meRatio}`;
-            }
-            
-            alert(alertMessage);
-        }
-        
-        function deleteCase(index) {
-            if (confirm('Eliminare questo caso?')) {
-                savedCases.splice(index, 1);
-                localStorage.setItem('nmc-cases', JSON.stringify(savedCases));
-                loadSavedCases();
-            }
         }
         
         function compareFollowup() {
