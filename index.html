@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NMC Diagnostic Tool - Anatomia Patologica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section.required {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            font-size: 0.7em;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        
+        .badge-required {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .badge-optional {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        input[type="number"], input[type="text"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .button-group button {
+            flex: 1;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .confidence-meter {
+            display: flex;
+            gap: 5px;
+            margin: 15px 0;
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            flex: 1;
+            background: #dee2e6;
+            border-radius: 4px;
+        }
+        
+        .confidence-bar.filled {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .pattern-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .pattern-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .ddx-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .ddx-item {
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ddx-primary {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        
+        .ddx-secondary {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .ddx-unlikely {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .report-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            white-space: pre-wrap;
+            border: 2px solid #dee2e6;
+            margin: 15px 0;
+        }
+        
+        .gap-analysis {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .gap-analysis h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .gap-analysis ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .progression-alert {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #721c24;
+        }
+        
+        .stable-alert {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #155724;
+        }
+        
+        .info-text {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .saved-cases {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .saved-case-item {
+            background: white;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .saved-case-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .case-info {
+            flex: 1;
+        }
+        
+        .case-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .small-btn {
+            padding: 5px 12px;
+            font-size: 0.85em;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 NMC Diagnostic Tool</h1>
+            <p>Workflow Anatomia Patologica - Pattern Recognition & Follow-up</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('new')">📋 Prima Diagnosi</div>
+            <div class="tab" onclick="switchTab('followup')">📊 Follow-up / Confronto</div>
+        </div>
+        
+        <!-- TAB PRIMA DIAGNOSI -->
+        <div id="tab-new" class="tab-content active">
+            <!-- ISTOLOGIA - OBBLIGATORIA -->
+            <div class="section required">
+                <h2>🔬 Valutazione Istologica <span class="badge badge-required">OBBLIGATORIO</span></h2>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Cellularità (%):</label>
+                        <input type="number" id="cellularity-percent" min="0" max="100" step="5" placeholder="Es: 80">
+                        <p class="info-text" id="cellularity-hint">Cellularità attesa per età: compila età per suggerimento</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Cellularità rispetto all'età:</label>
+                        <select id="cellularity">
+                            <option value="">-- Seleziona --</option>
+                            <option value="normal">Normale per età</option>
+                            <option value="increased">Aumentata per età</option>
+                            <option value="decreased">Diminuita per età</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Rapporto Mieloide/Eritroide (M/E):</label>
+                        <select id="me_ratio">
+                            <option value="">-- Non valutato --</option>
+                            <option value="normal">Normale (2-4:1)</option>
+                            <option value="increased">Aumentato (>4:1, eritropoiesi ridotta)</option>
+                            <option value="decreased">Ridotto (<2:1, eritropoiesi aumentata)</option>
+                            <option value="inverted">Invertito (<1:1, marcata eritropoiesi)</option>
+                        </select>
+                        <p class="info-text">Rapporto normale 2-4:1. Aumentato in PMF/fibrosi, ridotto in PV con eritropoiesi attiva</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Morfologia Megacariociti:</label>
+                        <select id="megakaryocyte">
+                            <option value="">-- Seleziona --</option>
+                            <option value="normal">Normali (dimensioni/morfologia)</option>
+                            <option value="hyperlobulated">Iperlobulati, maturi, grandi (ET-like)</option>
+                            <option value="clustered">Clustering denso con atipia (PMF-like)</option>
+                            <option value="pleomorphic">Pleomorfi, tutte le taglie (PV-like)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Proliferazione linee cellulari:</label>
+                        <select id="proliferation">
+                            <option value="">-- Seleziona --</option>
+                            <option value="minimal">Minima/Normale</option>
+                            <option value="megakaryocytic">Prevalentemente megacariocitica</option>
+                            <option value="panmyelosis">Panmielosi (E + G + M)</option>
+                            <option value="erythroid">Prevalentemente eritroide</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Fibrosi Reticolare (grading WHO):</label>
+                        <select id="fibrosis">
+                            <option value="">-- Seleziona --</option>
+                            <option value="0">MF-0: Assente</option>
+                            <option value="1">MF-1: Minima (loose network)</option>
+                            <option value="2">MF-2: Moderata (diffusa, dense network)</option>
+                            <option value="3">MF-3: Marcata (collagenizzazione)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- COMPONENTE LINFOIDE -->
+                <h3 style="margin: 20px 0 10px 0; color: #667eea; font-size: 1.1em;">Componente Linfoide</h3>
+                
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Componente linfoide (%):</label>
+                        <input type="number" id="lymphoid-percent" min="0" max="100" step="1" placeholder="Es: 15">
+                        <p class="info-text">Normale <20%. Se >20% considerare linfoma/linfocitosi</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Distribuzione linfoide:</label>
+                        <select id="lymphoid-distribution">
+                            <option value="">-- Non valutato --</option>
+                            <option value="normal">Distribuzione normale/sparsa</option>
+                            <option value="paratrabecular">Aggregati paratrabecolari</option>
+                            <option value="interstitial">Infiltrato interstiziale diffuso</option>
+                            <option value="nodular">Noduli/follicoli ben definiti</option>
+                            <option value="sheets">A lenzuolo (sospetto linfoma)</option>
+                        </select>
+                        <p class="info-text">Paratrabecolari tipici di linfomi B, interstiziale di linfomi T o reattivo</p>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Taglia cellule linfoidi:</label>
+                        <select id="lymphoid-size">
+                            <option value="">-- Non valutato --</option>
+                            <option value="small">Piccoli linfociti (B o T maturi)</option>
+                            <option value="mixed">Popolazione mista piccoli/medi</option>
+                            <option value="medium">Cellule medie (linfoma follicolare/mantellare)</option>
+                            <option value="large">Cellule grandi (DLBCL/linfoma T)</option>
+                            <option value="blastoid">Blastoidi/linfoblastici</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Morfologia prevalente (se valutabile su H&E):</label>
+                        <select id="lymphoid-morphology">
+                            <option value="">-- Non determinabile su H&E --</option>
+                            <option value="mixed">Popolazione linfoide mista (reattiva)</option>
+                            <option value="monotonous">Popolazione monotona (sospetta clonalità)</option>
+                            <option value="germinal">Con centri germinativi (follicolare/reattivo)</option>
+                            <option value="atypical">Atipie citologiche evidenti</option>
+                        </select>
+                        <p class="info-text">La tipizzazione definitiva B vs T richiede IHC (CD3/CD20)</p>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Note istologiche aggiuntive (opzionale):</label>
+                    <textarea id="histo-notes" placeholder="Es: presenza di dacriociti, eritroblasti, atipie specifiche..."></textarea>
+                </div>
+            </div>
+
+            <!-- IMMUNOISTOCHIMICA - OPZIONALE -->
+            <div class="section">
+                <h2>🧪 Immunoistochimica <span class="badge badge-optional">OPZIONALE</span></h2>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>CD34 (blasti e precursori immaturi):</label>
+                        <select id="cd34">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="negative">Negativo / Rari elementi</option>
+                            <option value="low"><5% (nei limiti)</option>
+                            <option value="intermediate">5-10% (borderline)</option>
+                            <option value="high">>10% (aumentati - rischio trasformazione)</option>
+                        </select>
+                        <p class="info-text">Quantifica blasti e cellule CD34+ immature</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>CD117 (c-KIT, precursori/mastociti):</label>
+                        <select id="cd117">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="negative">Negativo / Scarso</option>
+                            <option value="focal">Positivo focale su precursori</option>
+                            <option value="diffuse">Positivo diffuso</option>
+                            <option value="mast">Mastociti aumentati (>25/HPF)</option>
+                        </select>
+                        <p class="info-text">Identifica precursori e mastocitosi associata</p>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>CD61 (GPIIIa, megacariociti/piastrine):</label>
+                        <select id="cd61">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="normal">Megacariociti normali in numero/distribuzione</option>
+                            <option value="increased">Megacariociti aumentati</option>
+                            <option value="clustered">Megacariociti con clustering marcato</option>
+                            <option value="atypical">Forme atipiche/displastiche</option>
+                        </select>
+                        <p class="info-text">Identifica lineage megacariocitica</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>MPO (mieloperossidasi, linea granulocitaria):</label>
+                        <select id="mpo">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="normal">Maturazione granulocitaria normale</option>
+                            <option value="shift">Shift a sinistra (forme immature)</option>
+                            <option value="marked">Immaturità marcata</option>
+                            <option value="decreased">Espressione ridotta</option>
+                        </select>
+                        <p class="info-text">Valuta maturazione serie granulocitaria</p>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>CD14 (monociti):</label>
+                    <select id="cd14">
+                        <option value="">-- Non eseguito --</option>
+                        <option value="normal">Monociti normali (<10%)</option>
+                        <option value="increased">Monocitosi (10-20%)</option>
+                        <option value="high">Monocitosi marcata (>20%, sospetto LMMC)</option>
+                    </select>
+                    <p class="info-text">Esclude leucemia mielomonocitica cronica (LMMC)</p>
+                </div>
+                
+                <h3 style="margin: 20px 0 10px 0; color: #667eea; font-size: 1em;">Marcatori Linfoidi</h3>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>CD3 (linfociti T):</label>
+                        <select id="cd3">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="normal">Popolazione linfocitaria T normale</option>
+                            <option value="increased">Linfociti T aumentati (>20%)</option>
+                            <option value="aggregates">Aggregati linfoidi T</option>
+                            <option value="minimal">Linfociti T scarsi/assenti</option>
+                        </select>
+                        <p class="info-text">Esclude linfomi T o valuta infiltrato T reattivo</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>CD20 (linfociti B):</label>
+                        <select id="cd20">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="normal">Popolazione linfocitaria B normale</option>
+                            <option value="increased">Linfociti B aumentati (>20%)</option>
+                            <option value="aggregates">Aggregati linfoidi B (follicoli)</option>
+                            <option value="minimal">Linfociti B scarsi/assenti</option>
+                        </select>
+                        <p class="info-text">Esclude linfomi B o valuta infiltrato B reattivo</p>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>CD138 (plasmacellule):</label>
+                        <select id="cd138">
+                            <option value="">-- Non eseguito --</option>
+                            <option value="normal">Plasmacellule <5% (normale)</option>
+                            <option value="increased">Plasmacellule 5-10% (aumentate)</option>
+                            <option value="high">Plasmacellule >10% (sospetto mieloma)</option>
+                            <option value="clusters">Aggregati plasmacellulari</option>
+                        </select>
+                        <p class="info-text">Esclude mieloma o valuta plasmocitosi reattiva</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="kl_performed" onchange="toggleKL()">
+                            <label for="kl_performed">Rapporto Kappa/Lambda eseguito</label>
+                        </div>
+                        <select id="kappa_lambda" style="display: none; margin-top: 10px;">
+                            <option value="">-- Seleziona risultato --</option>
+                            <option value="normal">Normale (K/L 0.6-4.0, policlonale)</option>
+                            <option value="kappa">Eccesso Kappa (K/L >4.0, sospetta clonalità)</option>
+                            <option value="lambda">Eccesso Lambda (K/L <0.6, sospetta clonalità)</option>
+                            <option value="monoclonal">Monoclonale (mieloma/linfoma B)</option>
+                        </select>
+                        <p class="info-text">Rapporto normale 2:1 (range 0.6-4.0). Alterato suggerisce clonalità plasmacellulare/B</p>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Perls (ferro/emosiderina):</label>
+                    <select id="perls">
+                        <option value="">-- Non eseguito --</option>
+                        <option value="normal">Depositi di ferro nella norma</option>
+                        <option value="decreased">Depositi di ferro ridotti/assenti (PV-like)</option>
+                        <option value="increased">Emosiderina aumentata (eritropoiesi inefficace)</option>
+                    </select>
+                    <p class="info-text">Valuta depositi di ferro (ridotti in PV, aumentati in MDS/PMF)</p>
+                </div>
+            </div>
+            
+            <!-- DATI CLINICI - OPZIONALI -->
+            <div class="section">
+                <h2>🩺 Dati Clinici <span class="badge badge-optional">OPZIONALE</span></h2>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Quesito clinico:</label>
+                        <textarea id="clinical-question" placeholder="Es: piastrinosi da 6 mesi, escludere ET"></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Diagnosi clinica sospetta (se indicata):</label>
+                        <input type="text" id="suspected-diagnosis" placeholder="Es: ET, PV...">
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Età:</label>
+                        <input type="number" id="age" min="0" max="120" placeholder="Anni">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Sesso:</label>
+                        <select id="sex">
+                            <option value="">-- Non specificato --</option>
+                            <option value="M">Maschio</option>
+                            <option value="F">Femmina</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="splenomegaly">
+                    <label for="splenomegaly">Splenomegalia</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="symptoms">
+                    <label for="symptoms">Sintomi costituzionali</label>
+                </div>
+            </div>
+            
+            <!-- EMOCROMO - OPZIONALE -->
+            <div class="section">
+                <h2>🩸 Parametri Ematologici <span class="badge badge-optional">OPZIONALE</span></h2>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Emoglobina (g/dL):</label>
+                        <input type="number" id="hb" step="0.1" min="0" max="25" placeholder="Es: 14.5">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Ematocrito (%):</label>
+                        <input type="number" id="hct" step="0.1" min="0" max="100" placeholder="Es: 42">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Piastrine (×10⁹/L):</label>
+                        <input type="number" id="plt" min="0" max="5000" placeholder="Es: 650">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Leucociti (×10⁹/L):</label>
+                        <input type="number" id="wbc" step="0.1" min="0" max="500" placeholder="Es: 12.5">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MOLECOLARE - OPZIONALE -->
+            <div class="section">
+                <h2>🧬 Profilo Molecolare <span class="badge badge-optional">OPZIONALE</span></h2>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="jak2">
+                    <label for="jak2">JAK2 V617F o exon 12 positivo</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="calr">
+                    <label for="calr">CALR mutato</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="mpl">
+                    <label for="mpl">MPL mutato</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="triple-neg">
+                    <label for="triple-neg">Triple-negative (JAK2-/CALR-/MPL-)</label>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="analyzeCase()">🔍 Analizza Caso</button>
+                <button class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
+            </div>
+            
+            <div id="result-new" class="result"></div>
+        </div>
+        
+        <!-- TAB FOLLOW-UP -->
+        <div id="tab-followup" class="tab-content">
+            <div class="saved-cases" id="saved-cases-list">
+                <h3>📁 Casi Salvati</h3>
+                <p class="info-text">I casi vengono salvati localmente nel browser. Selezionane uno per il follow-up.</p>
+                <div id="cases-container"></div>
+            </div>
+            
+            <div class="section">
+                <h2>📋 Dati Biopsia Precedente</h2>
+                
+                <div class="grid-2">
+                    <div class="input-group">
+                        <label>Data BOM precedente:</label>
+                        <input type="date" id="prev-date">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Diagnosi precedente:</label>
+                        <select id="prev-diagnosis">
+                            <option value="">-- Seleziona --</option>
+                            <option value="ET">Trombocitemia Essenziale (ET)</option>
+                            <option value="PV">Policitemia Vera (PV)</option>
+                            <option value="PMF">Mielofibrosi Primaria (PMF)</option>
+                            <option value="Pre-PMF">Pre-PMF</option>
+                            <option value="MPN-U">MPN non classificabile</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Fibrosi precedente:</label>
+                        <select id="prev-fibrosis">
+                            <option value="0">MF-0</option>
+                            <option value="1">MF-1</option>
+                            <option value="2">MF-2</option>
+                            <option value="3">MF-3</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Cellularità precedente:</label>
+                        <select id="prev-cellularity">
+                            <option value="normal">Normale</option>
+                            <option value="increased">Aumentata</option>
+                            <option value="decreased">Diminuita</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section required">
+                <h2>🔬 Valutazione Istologica Attuale</h2>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Cellularità attuale:</label>
+                        <select id="curr-cellularity">
+                            <option value="">-- Seleziona --</option>
+                            <option value="normal">Normale per età</option>
+                            <option value="increased">Aumentata per età</option>
+                            <option value="decreased">Diminuita per età</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Fibrosi attuale:</label>
+                        <select id="curr-fibrosis">
+                            <option value="">-- Seleziona --</option>
+                            <option value="0">MF-0</option>
+                            <option value="1">MF-1</option>
+                            <option value="2">MF-2</option>
+                            <option value="3">MF-3</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Morfologia Megacariociti:</label>
+                        <select id="curr-megakaryocyte">
+                            <option value="">-- Seleziona --</option>
+                            <option value="normal">Normali</option>
+                            <option value="hyperlobulated">Iperlobulati, maturi, grandi</option>
+                            <option value="clustered">Clustering denso con atipia</option>
+                            <option value="pleomorphic">Pleomorfi</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Proliferazione attuale:</label>
+                        <select id="curr-proliferation">
+                            <option value="">-- Seleziona --</option>
+                            <option value="minimal">Minima/Normale</option>
+                            <option value="megakaryocytic">Prevalentemente megacariocitica</option>
+                            <option value="panmyelosis">Panmielosi</option>
+                            <option value="erythroid">Prevalentemente eritroide</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Blast %:</label>
+                    <input type="number" id="curr-blasts" step="0.1" min="0" max="100" placeholder="Se aumentati">
+                </div>
+            </div>
+            
+            <button onclick="compareFollowup()">📊 Confronta Follow-up</button>
+            
+            <div id="result-followup" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let savedCases = JSON.parse(localStorage.getItem('nmc-cases') || '[]');
+        
+        function toggleKL() {
+            const checkbox = document.getElementById('kl_performed');
+            const select = document.getElementById('kappa_lambda');
+            select.style.display = checkbox.checked ? 'block' : 'none';
+            if (!checkbox.checked) {
+                select.value = '';
+            }
+        }
+        
+        function updateCellularityHint() {
+            const age = document.getElementById('age').value;
+            const hintElement = document.getElementById('cellularity-hint');
+            
+            if (age && age > 0 && age <= 120) {
+                const expectedCellularity = Math.max(0, 100 - parseInt(age));
+                hintElement.textContent = `Cellularità attesa per età ${age} anni: ~${expectedCellularity}% (formula: 100 - età)`;
+                hintElement.style.color = '#667eea';
+                hintElement.style.fontWeight = '600';
+            } else {
+                hintElement.textContent = 'Cellularità attesa per età: compila età per suggerimento';
+                hintElement.style.color = '#666';
+                hintElement.style.fontWeight = 'normal';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const ageInput = document.getElementById('age');
+            if (ageInput) {
+                ageInput.addEventListener('input', updateCellularityHint);
+            }
+        });
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            if (tab === 'new') {
+                document.querySelectorAll('.tab')[0].classList.add('active');
+                document.getElementById('tab-new').classList.add('active');
+            } else {
+                document.querySelectorAll('.tab')[1].classList.add('active');
+                document.getElementById('tab-followup').classList.add('active');
+                loadSavedCases();
+            }
+        }
+        
+        function analyzeCase() {
+            const cellularity = document.getElementById('cellularity').value;
+            const megakaryocyte = document.getElementById('megakaryocyte').value;
+            const proliferation = document.getElementById('proliferation').value;
+            const fibrosis = document.getElementById('fibrosis').value;
+            
+            if (!cellularity || !megakaryocyte || !proliferation || fibrosis === '') {
+                alert('Compila almeno i campi istologici obbligatori!');
+                return;
+            }
+            
+            const data = {
+                histology: {
+                    cellularity,
+                    cellularityPercent: document.getElementById('cellularity-percent').value,
+                    meRatio: document.getElementById('me_ratio').value,
+                    megakaryocyte,
+                    proliferation,
+                    fibrosis: parseInt(fibrosis),
+                    lymphoidPercent: document.getElementById('lymphoid-percent').value,
+                    lymphoidDistribution: document.getElementById('lymphoid-distribution').value,
+                    lymphoidSize: document.getElementById('lymphoid-size').value,
+                    lymphoidMorphology: document.getElementById('lymphoid-morphology').value,
+                    notes: document.getElementById('histo-notes').value
+                },
+                ihc: {
+                    cd34: document.getElementById('cd34').value,
+                    cd117: document.getElementById('cd117').value,
+                    cd61: document.getElementById('cd61').value,
+                    mpo: document.getElementById('mpo').value,
+                    cd14: document.getElementById('cd14').value,
+                    cd3: document.getElementById('cd3').value,
+                    cd20: document.getElementById('cd20').value,
+                    cd138: document.getElementById('cd138').value,
+                    kappa_lambda: document.getElementById('kl_performed').checked ? document.getElementById('kappa_lambda').value : '',
+                    perls: document.getElementById('perls').value
+                },
+                clinical: {
+                    question: document.getElementById('clinical-question').value,
+                    suspected: document.getElementById('suspected-diagnosis').value,
+                    age: document.getElementById('age').value,
+                    sex: document.getElementById('sex').value,
+                    splenomegaly: document.getElementById('splenomegaly').checked,
+                    symptoms: document.getElementById('symptoms').checked
+                },
+                lab: {
+                    hb: document.getElementById('hb').value,
+                    hct: document.getElementById('hct').value,
+                    plt: document.getElementById('plt').value,
+                    wbc: document.getElementById('wbc').value
+                },
+                molecular: {
+                    jak2: document.getElementById('jak2').checked,
+                    calr: document.getElementById('calr').checked,
+                    mpl: document.getElementById('mpl').checked,
+                    tripleNeg: document.getElementById('triple-neg').checked
+                }
+            };
+            
+            const patternResult = recognizePattern(data.histology, data.ihc);
+            const pattern = patternResult.patterns;
+            const alerts = patternResult.alerts;
+            
+            const ddx = generateDDx(data, pattern);
+            const gaps = findGaps(data);
+            const reportText = generateReport(data, pattern, ddx);
+            
+            displayResults(pattern, ddx, gaps, reportText, data, alerts);
+        }
+        
+        function recognizePattern(histo, ihc) {
+            let patterns = [];
+            let alerts = [];
+            
+            // ALERT COMPONENTE LINFOIDE
+            if (histo.lymphoidPercent && parseFloat(histo.lymphoidPercent) > 20) {
+                const severity = parseFloat(histo.lymphoidPercent) > 50 ? 'MASSIVA' : 'aumentata';
+                let morphologyHint = '';
+                
+                if (histo.lymphoidDistribution === 'paratrabecular') {
+                    morphologyHint = ' - Pattern paratrabecolare suggerisce linfoma B (LLC, linfoma follicolare, mantellare)';
+                } else if (histo.lymphoidDistribution === 'interstitial') {
+                    morphologyHint = ' - Pattern interstiziale: considerare linfoma T o infiltrato reattivo';
+                } else if (histo.lymphoidDistribution === 'sheets') {
+                    morphologyHint = ' - Pattern a lenzuolo: ALTO SOSPETTO LINFOMA AGGRESSIVO';
+                }
+                
+                alerts.push({
+                    type: parseFloat(histo.lymphoidPercent) > 50 ? 'danger' : 'warning',
+                    message: `⚠️ Componente linfoide ${severity} (${histo.lymphoidPercent}%)${morphologyHint} - ESCLUDERE LINFOMA: richiedere citofluorimetria, IHC estesa (CD3, CD20, CD5, CD10, BCL2, BCL6, Ciclin D1), eventualmente biologia molecolare`
+                });
+            }
+            
+            // Alert morfologia linfoide sospetta
+            if (histo.lymphoidMorphology === 'monotonous' || histo.lymphoidMorphology === 'atypical') {
+                alerts.push({
+                    type: 'danger',
+                    message: '⚠️ Morfologia linfoide sospetta per clonalità - Richiedere URGENTEMENTE citofluorimetria e pannello IHC linfomi'
+                });
+            }
+            
+            // Correlazione linfociti con IHC
+            if (histo.lymphoidPercent && parseFloat(histo.lymphoidPercent) > 20) {
+                if (ihc.cd3 === 'increased' && ihc.cd20 !== 'increased') {
+                    alerts.push({
+                        type: 'info',
+                        message: 'Linfocitosi a prevalente fenotipo T (CD3+) - Considerare: linfoma T, LGL, espansione T reattiva. Valutare clonalità TCR'
+                    });
+                } else if (ihc.cd20 === 'increased' && ihc.cd3 !== 'increased') {
+                    alerts.push({
+                        type: 'info',
+                        message: 'Linfocitosi a prevalente fenotipo B (CD20+) - Considerare: LLC/SLL, linfoma B, espansione B reattiva. Valutare clonalità e immunofenotipo esteso'
+                    });
+                }
+            }
+            
+            // Alert cellularità
+            if (histo.cellularityPercent && histo.cellularityPercent > 90) {
+                alerts.push({
+                    type: 'warning',
+                    message: `Cellularità ${histo.cellularityPercent}%: marcata ipercellularità, tipico di NMC in fase attiva`
+                });
+            }
+            
+            // Alert M/E
+            if (histo.meRatio === 'inverted' || histo.meRatio === 'decreased') {
+                alerts.push({
+                    type: 'info',
+                    message: `Rapporto M/E ${histo.meRatio === 'inverted' ? 'invertito' : 'ridotto'}: suggerisce eritropoiesi aumentata, compatibile con PV`
+                });
+            }
+            
+            if (histo.meRatio === 'increased' && histo.fibrosis >= 2) {
+                alerts.push({
+                    type: 'info',
+                    message: 'Rapporto M/E aumentato + fibrosi: compatibile con eritropoiesi inefficace in PMF'
+                });
+            }
+            
+            // Alert blasti
+            if (ihc.cd34 === 'high') {
+                alerts.push({
+                    type: 'danger',
+                    message: '⚠️ CD34 >10%: RISCHIO TRASFORMAZIONE BLASTICA - Valutare urgentemente blast count, citogenetica e NGS panel'
+                });
+            } else if (ihc.cd34 === 'intermediate') {
+                alerts.push({
+                    type: 'warning',
+                    message: 'CD34 5-10%: Valore borderline, monitorare attentamente in follow-up'
+                });
+            }
+            
+            // Alert LMMC
+            if (ihc.cd14 === 'high') {
+                alerts.push({
+                    type: 'danger',
+                    message: '⚠️ Monocitosi marcata >20%: SOSPETTO LMMC (Leucemia Mielomonocitica Cronica) - Escludere con emocromo (monociti assoluti >1×10⁹/L), displasia, citogenetica'
+                });
+            } else if (ihc.cd14 === 'increased') {
+                alerts.push({
+                    type: 'warning',
+                    message: 'Monocitosi 10-20%: borderline per LMMC, correlare con monociti assoluti su emocromo'
+                });
+            }
+            
+            // Alert plasmacellule
+            if (ihc.cd138 === 'high') {
+                alerts.push({
+                    type: 'danger',
+                    message: '⚠️ Plasmacellule >10%: ESCLUDERE MIELOMA MULTIPLO - Richiedere immunofissazione sierica/urinaria, dosaggio catene leggere'
+                });
+            }
+            
+            // Alert K/L
+            if (ihc.kappa_lambda === 'kappa' || ihc.kappa_lambda === 'lambda' || ihc.kappa_lambda === 'monoclonal') {
+                alerts.push({
+                    type: 'danger',
+                    message: '⚠️ Rapporto K/L alterato: CLONALITÀ PLASMACELLULARE/B - Escludere mieloma multiplo, linfoma B, MGUS. Richiedere immunofissazione, elettroforesi proteine'
+                });
+            }
+            
+            // Alert linfociti aumentati
+            if (ihc.cd3 === 'increased' || ihc.cd20 === 'increased') {
+                if (!histo.lymphoidPercent || parseFloat(histo.lymphoidPercent) <= 20) {
+                    alerts.push({
+                        type: 'warning',
+                        message: 'Linfociti aumentati: valutare per linfoma/linfocitosi reattiva - considerare citofluorimetria'
+                    });
+                }
+            }
+            
+            // PATTERN RECOGNITION NMC
+            if (histo.megakaryocyte === 'hyperlobulated' && 
+                histo.proliferation === 'megakaryocytic' && 
+                histo.fibrosis <= 1) {
+                let ihcSupport = [];
+                
+                if (ihc.cd61 === 'increased') {
+                    ihcSupport.push('CD61 positivo: proliferazione megacariocitica confermata');
+                }
+                if (ihc.cd34 === 'low' || ihc.cd34 === 'negative') {
+                    ihcSupport.push('CD34 nei limiti (esclude accelerazione/trasformazione)');
+                }
+                if (ihc.perls === 'normal') {
+                    ihcSupport.push('Perls: depositi di ferro nella norma');
+                }
+                
+                patterns.push({
+                    name: 'ET',
+                    confidence: 'alta',
+                    description: 'Proliferazione megacariocitica con forme iperlobulate mature, fibrosi minima/assente',
+                    ihc: ihcSupport
+                });
+            }
+            
+            if (histo.proliferation === 'panmyelosis' && 
+                histo.cellularity === 'increased' && 
+                histo.megakaryocyte === 'pleomorphic') {
+                let ihcSupport = [];
+                
+                if (histo.meRatio === 'decreased' || histo.meRatio === 'inverted') {
+                    ihcSupport.push('Rapporto M/E ridotto/invertito (eritropoiesi aumentata, tipico di PV)');
+                }
+                if (ihc.perls === 'decreased') {
+                    ihcSupport.push('Perls: depositi di ferro ridotti/assenti (TIPICO DI PV per eritropoiesi attiva)');
+                }
+                if (ihc.mpo === 'shift' || ihc.mpo === 'normal') {
+                    ihcSupport.push('MPO: proliferazione granulocitaria confermata');
+                }
+                if (ihc.cd61 === 'increased') {
+                    ihcSupport.push('CD61: megacariociti aumentati (panmielosi)');
+                }
+                
+                patterns.push({
+                    name: 'PV',
+                    confidence: 'alta',
+                    description: 'Panmielosi con ipercellularità, megacariociti pleomorfi',
+                    ihc: ihcSupport
+                });
+            }
+            
+            if (histo.megakaryocyte === 'clustered') {
+                const subtype = histo.fibrosis >= 2 ? 'PMF overt' : 'Pre-PMF';
+                let ihcSupport = [];
+                
+                if (histo.meRatio === 'increased' && histo.fibrosis >= 2) {
+                    ihcSupport.push('Rapporto M/E aumentato con fibrosi (eritropoiesi inefficace tipica di PMF)');
+                }
+                if (ihc.cd61 === 'clustered' || ihc.cd61 === 'atypical') {
+                    ihcSupport.push('CD61: megacariociti con clustering denso/atipie displastiche');
+                }
+                if (ihc.cd117 === 'mast') {
+                    ihcSupport.push('CD117: mastocitosi associata (comune in PMF)');
+                }
+                if (ihc.perls === 'increased') {
+                    ihcSupport.push('Perls: emosiderina aumentata (eritropoiesi inefficace in PMF)');
+                }
+                
+                patterns.push({
+                    name: subtype,
+                    confidence: 'alta',
+                    description: `Clustering megacariocitico con atipia, fibrosi MF-${histo.fibrosis}`,
+                    ihc: ihcSupport
+                });
+            }
+            
+            if (patterns.length === 0) {
+                if (histo.fibrosis >= 2) {
+                    patterns.push({
+                        name: 'Fibrosi secondaria',
+                        confidence: 'media',
+                        description: 'Fibrosi marcata senza pattern tipico MPN',
+                        ihc: []
+                    });
+                } else {
+                    patterns.push({
+                        name: 'Non diagnostico',
+                        confidence: 'bassa',
+                        description: 'Pattern istologico non specifico per NMC',
+                        ihc: []
+                    });
+                }
+            }
+            
+            return { patterns, alerts };
+        }
+        
+        function generateDDx(data, patterns) {
+            let ddx = [];
+            
+            patterns.forEach(p => {
+                let priority = 'primary';
+                let supportingData = [];
+                
+                if (data.molecular.jak2 && p.name.includes('PV')) {
+                    supportingData.push('JAK2+ supporta PV');
+                }
+                if (data.molecular.jak2 && p.name === 'ET') {
+                    supportingData.push('JAK2+ compatibile con ET');
+                }
+                if (data.molecular.calr && p.name === 'ET') {
+                    supportingData.push('CALR+ tipico di ET');
+                }
+                
+                if (data.lab.plt && parseFloat(data.lab.plt) >= 450 && p.name === 'ET') {
+                    supportingData.push(`PLT ${data.lab.plt} supporta ET`);
+                }
+                
+                if (data.lab.hb && data.clinical.sex) {
+                    const hbThreshold = data.clinical.sex === 'M' ? 16.5 : 16.0;
+                    if (parseFloat(data.lab.hb) > hbThreshold && p.name.includes('PV')) {
+                        supportingData.push(`Hb ${data.lab.hb} supporta PV`);
+                    }
+                }
+                
+                if (supportingData.length === 0 && p.ihc.length === 0) priority = 'secondary';
+                
+                ddx.push({
+                    diagnosis: p.name,
+                    confidence: p.confidence,
+                    priority,
+                    pattern: p.description,
+                    supporting: supportingData,
+                    ihc: p.ihc
+                });
+            });
+            
+            return ddx;
+        }
+        
+        function findGaps(data) {
+            let gaps = [];
+            
+            if (!data.molecular.jak2 && !data.molecular.calr && !data.molecular.mpl && !data.molecular.tripleNeg) {
+                gaps.push('Profilo molecolare (JAK2, CALR, MPL)');
+            }
+            
+            if (!data.lab.hb || !data.lab.plt || !data.lab.wbc) {
+                gaps.push('Emocromo completo recente');
+            }
+            
+            if (!data.clinical.age || !data.clinical.sex) {
+                gaps.push('Dati anagrafici completi');
+            }
+            
+            if (!data.clinical.splenomegaly && !data.clinical.symptoms) {
+                gaps.push('Valutazione clinica (splenomegalia, sintomi)');
+            }
+            
+            const hasIHC = data.ihc.cd34 || data.ihc.cd117 || data.ihc.cd61 || data.ihc.mpo || data.ihc.cd14 || data.ihc.cd3 || data.ihc.cd20 || data.ihc.cd138 || data.ihc.kappa_lambda || data.ihc.perls;
+            if (!hasIHC) {
+                gaps.push('Immunoistochimica (suggerite: CD34, CD61, Perls) per caratterizzazione completa');
+            } else {
+                if (!data.ihc.cd34 && data.histology.fibrosis >= 2) {
+                    gaps.push('CD34 (utile per quantificare blasti in presenza di fibrosi)');
+                }
+                if (!data.ihc.cd61 && data.histology.megakaryocyte !== 'normal') {
+                    gaps.push('CD61 (utile per caratterizzare meglio i megacariociti)');
+                }
+                if (!data.ihc.perls && (data.histology.proliferation === 'panmyelosis' || data.histology.fibrosis >= 2)) {
+                    gaps.push('Perls (utile: ferro ridotto in PV, aumentato in PMF/MDS)');
+                }
+                if (!data.ihc.cd138 && data.histology.cellularity === 'increased') {
+                    gaps.push('CD138 (utile per escludere mieloma multiplo in ipercellularità)');
+                }
+                if ((data.ihc.cd138 === 'increased' || data.ihc.cd138 === 'high') && !data.ihc.kappa_lambda) {
+                    gaps.push('Rapporto K/L (ESSENZIALE per escludere clonalità plasmacellulare/mieloma)');
+                }
+                if (!data.ihc.cd14 && data.histology.proliferation !== 'minimal') {
+                    gaps.push('CD14 (raccomandato per escludere LMMC)');
+                }
+            }
+            
+            return gaps;
+        }
+        
+        function generateReport(data, patterns, ddx) {
+            let report = `DIAGNOSI ISTOLOGICA:\n\n`;
+            
+            report += `MIDOLLO OSSEO:\n`;
+            if (data.histology.cellularityPercent) {
+                report += `- Cellularità: ${data.histology.cellularityPercent}% (${translateCellularity(data.histology.cellularity)})\n`;
+            } else {
+                report += `- Cellularità: ${translateCellularity(data.histology.cellularity)}\n`;
+            }
+            if (data.histology.meRatio) {
+                report += `- Rapporto M/E: ${translateMERatio(data.histology.meRatio)}\n`;
+            }
+            report += `- Megacariociti: ${translateMegakaryocyte(data.histology.megakaryocyte)}\n`;
+            report += `- Proliferazione: ${translateProliferation(data.histology.proliferation)}\n`;
+            report += `- Fibrosi: MF-${data.histology.fibrosis}\n`;
+            
+            // COMPONENTE LINFOIDE
+            if (data.histology.lymphoidPercent || data.histology.lymphoidDistribution) {
+                report += `\nCOMPONENTE LINFOIDE:\n`;
+                if (data.histology.lymphoidPercent) {
+                    report += `- Percentuale: ${data.histology.lymphoidPercent}%`;
+                    if (parseFloat(data.histology.lymphoidPercent) > 20) {
+                        report += ` (AUMENTATA)`;
+                    }
+                    report += `\n`;
+                }
+                if (data.histology.lymphoidDistribution) {
+                    report += `- Distribuzione: ${translateLymphoidDistribution(data.histology.lymphoidDistribution)}\n`;
+                }
+                if (data.histology.lymphoidSize) {
+                    report += `- Taglia: ${translateLymphoidSize(data.histology.lymphoidSize)}\n`;
+                }
+                if (data.histology.lymphoidMorphology) {
+                    report += `- Morfologia: ${translateLymphoidMorphology(data.histology.lymphoidMorphology)}\n`;
+                }
+            }
+            
+            if (data.histology.notes) report += `- Note: ${data.histology.notes}\n`;
+            
+            // IHC
+            const hasIHC = data.ihc.cd34 || data.ihc.cd117 || data.ihc.cd61 || data.ihc.mpo || data.ihc.cd14 || data.ihc.cd3 || data.ihc.cd20 || data.ihc.cd138 || data.ihc.kappa_lambda || data.ihc.perls;
+            if (hasIHC) {
+                report += `\nIMMUNOISTOCHIMICA:\n`;
+                if (data.ihc.cd34) report += `- CD34: ${translateIHC('cd34', data.ihc.cd34)}\n`;
+                if (data.ihc.cd117) report += `- CD117: ${translateIHC('cd117', data.ihc.cd117)}\n`;
+                if (data.ihc.cd61) report += `- CD61: ${translateIHC('cd61', data.ihc.cd61)}\n`;
+                if (data.ihc.mpo) report += `- MPO: ${translateIHC('mpo', data.ihc.mpo)}\n`;
+                if (data.ihc.cd14) report += `- CD14: ${translateIHC('cd14', data.ihc.cd14)}\n`;
+                if (data.ihc.cd3) report += `- CD3: ${translateIHC('cd3', data.ihc.cd3)}\n`;
+                if (data.ihc.cd20) report += `- CD20: ${translateIHC('cd20', data.ihc.cd20)}\n`;
+                if (data.ihc.cd138) report += `- CD138: ${translateIHC('cd138', data.ihc.cd138)}\n`;
+                if (data.ihc.kappa_lambda) report += `- Kappa/Lambda: ${translateIHC('kappa_lambda', data.ihc.kappa_lambda)}\n`;
+                if (data.ihc.perls) report += `- Perls (ferro): ${translateIHC('perls', data.ihc.perls)}\n`;
+            }
+            
+            report += `\nCONCLUSIONI:\n`;
+            
+            const primary = ddx.find(d => d.priority === 'primary');
+            if (primary) {
+                report += `Quadro istologico compatibile con ${primary.diagnosis}.\n`;
+                report += `${primary.pattern}.\n`;
+                
+                if (primary.ihc && primary.ihc.length > 0) {
+                    report += `\nConferme immunoistochimiche:\n`;
+                    primary.ihc.forEach(i => report += `- ${i}\n`);
+                }
+                
+                if (primary.supporting.length > 0) {
+                    report += `\nDati clinico-laboratoristici supportanti:\n`;
+                    primary.supporting.forEach(s => report += `- ${s}\n`);
+                }
+            } else {
+                report += `${patterns[0].description}.\n`;
+            }
+            
+            report += `\nNOTA: Per diagnosi definitiva secondo criteri WHO 2022, necessaria integrazione con dati clinici, ematochimici e molecolari completi.`;
+            
+            return report;
+        }
+        
+        function translateCellularity(val) {
+            const map = {
+                'normal': 'nella norma per età',
+                'increased': 'aumentata per età',
+                'decreased': 'ridotta per età'
+            };
+            return map[val] || val;
+        }
+        
+        function translateMegakaryocyte(val) {
+            const map = {
+                'normal': 'morfologia e distribuzione nei limiti',
+                'hyperlobulated': 'iperlobulati, maturi, di grandi dimensioni (pattern ET-like)',
+                'clustered': 'clustering denso con marcata atipia e displasia (pattern PMF-like)',
+                'pleomorphic': 'pleomorfi di tutte le taglie (pattern PV-like)'
+            };
+            return map[val] || val;
+        }
+        
+        function translateProliferation(val) {
+            const map = {
+                'minimal': 'assente/minima',
+                'megakaryocytic': 'prevalentemente della linea megacariocitica',
+                'panmyelosis': 'panmielosi (eritroide + granulocitaria + megacariocitica)',
+                'erythroid': 'prevalentemente della linea eritroide'
+            };
+            return map[val] || val;
+        }
+        
+        function translateMERatio(val) {
+            const map = {
+                'normal': 'normale (2-4:1)',
+                'increased': 'aumentato (>4:1, eritropoiesi ridotta/inefficace)',
+                'decreased': 'ridotto (<2:1, eritropoiesi aumentata)',
+                'inverted': 'invertito (<1:1, marcata eritropoiesi - compatibile PV)'
+            };
+            return map[val] || val;
+        }
+        
+        function translateLymphoidDistribution(val) {
+            const map = {
+                'normal': 'sparsa, nei limiti',
+                'paratrabecular': 'aggregati paratrabecolari (pattern linfoma B)',
+                'interstitial': 'infiltrato interstiziale diffuso',
+                'nodular': 'noduli/follicoli linfoidi',
+                'sheets': 'pattern a lenzuolo (SOSPETTO LINFOMA AGGRESSIVO)'
+            };
+            return map[val] || val;
+        }
+        
+        function translateLymphoidSize(val) {
+            const map = {
+                'small': 'piccoli linfociti maturi',
+                'mixed': 'popolazione mista piccoli/medi',
+                'medium': 'cellule medie',
+                'large': 'cellule grandi (sospetto linfoma ad alto grado)',
+                'blastoid': 'aspetto blastoide/linfoblastico'
+            };
+            return map[val] || val;
+        }
+        
+        function translateLymphoidMorphology(val) {
+            const map = {
+                'mixed': 'popolazione eterogenea (compatibile con reattività)',
+                'monotonous': 'popolazione monotona (SOSPETTA CLONALITÀ)',
+                'germinal': 'con centri germinativi',
+                'atypical': 'atipie citologiche evidenti (SOSPETTO LINFOMA)'
+            };
+            return map[val] || val;
+        }
+        
+        function translateIHC(marker, value) {
+            const translations = {
+                cd34: {
+                    'negative': 'negativo/rari elementi (<1%)',
+                    'low': 'positivo in <5% delle cellule (nei limiti)',
+                    'intermediate': 'positivo in 5-10% delle cellule (borderline)',
+                    'high': 'positivo in >10% delle cellule (aumentato, RISCHIO TRASFORMAZIONE)'
+                },
+                cd117: {
+                    'negative': 'negativo/scarsa espressione',
+                    'focal': 'positivo focale su precursori mieloidi',
+                    'diffuse': 'positivo diffuso',
+                    'mast': 'mastociti aumentati (>25/HPF, possibile mastocitosi associata)'
+                },
+                cd61: {
+                    'normal': 'megacariociti normali in numero e distribuzione',
+                    'increased': 'megacariociti aumentati di numero',
+                    'clustered': 'megacariociti con clustering marcato',
+                    'atypical': 'megacariociti con atipie morfologiche/displastiche'
+                },
+                mpo: {
+                    'normal': 'maturazione granulocitaria nei limiti',
+                    'shift': 'shift a sinistra (presenza di forme immature)',
+                    'marked': 'immaturità granulocitaria marcata',
+                    'decreased': 'espressione ridotta/anomala'
+                },
+                cd14: {
+                    'normal': 'monociti <10% (nella norma)',
+                    'increased': 'monocitosi 10-20% (borderline, correlare con emocromo)',
+                    'high': 'monocitosi marcata >20% (SOSPETTO LMMC - escludere leucemia mielomonocitica cronica)'
+                },
+                cd3: {
+                    'normal': 'popolazione linfocitaria T normale (<20%)',
+                    'increased': 'linfociti T aumentati (>20%, valutare linfoma/linfocitosi reattiva)',
+                    'aggregates': 'aggregati linfoidi T (considerare citofluorimetria)',
+                    'minimal': 'linfociti T scarsi/assenti'
+                },
+                cd20: {
+                    'normal': 'popolazione linfocitaria B normale (<20%)',
+                    'increased': 'linfociti B aumentati (>20%, valutare linfoma/linfocitosi reattiva)',
+                    'aggregates': 'aggregati linfoidi B/follicoli (considerare citofluorimetria)',
+                    'minimal': 'linfociti B scarsi/assenti'
+                },
+                cd138: {
+                    'normal': 'plasmacellule <5% (nella norma)',
+                    'increased': 'plasmacellule 5-10% (lievemente aumentate, possibile plasmocitosi reattiva)',
+                    'high': 'plasmacellule >10% (ESCLUDERE MIELOMA MULTIPLO - richiedere immunofissazione)',
+                    'clusters': 'aggregati plasmacellulari (valutare per discrasia plasmacellulare)'
+                },
+                kappa_lambda: {
+                    'normal': 'rapporto K/L nella norma (0.6-4.0, popolazione policlonale)',
+                    'kappa': 'eccesso di catene kappa (K/L >4.0, SOSPETTA CLONALITÀ - valutare mieloma/linfoma B)',
+                    'lambda': 'eccesso di catene lambda (K/L <0.6, SOSPETTA CLONALITÀ - valutare mieloma/linfoma B)',
+                    'monoclonal': 'popolazione monoclonale evidenziata (CONFERMA DISCRASIA PLASMACELLULARE/LINFOMA B)'
+                },
+                perls: {
+                    'normal': 'depositi di ferro nella norma',
+                    'decreased': 'depositi di ferro ridotti/assenti (compatibile con PV per eritropoiesi attiva)',
+                    'increased': 'emosiderina aumentata (eritropoiesi inefficace, compatibile con PMF/MDS)'
+                }
+            };
+            
+            return translations[marker][value] || value;
+        }
+        
+        function displayResults(patterns, ddx, gaps, reportText, data, alerts) {
+            const resultDiv = document.getElementById('result-new');
+            
+            let html = `<h3>🎯 Analisi Pattern Istologico</h3>`;
+            
+            if (alerts && alerts.length > 0) {
+                alerts.forEach(alert => {
+                    let alertClass = 'alert-danger';
+                    let alertIcon = '🚨 ALERT CRITICO';
+                    
+                    if (alert.type === 'warning') {
+                        alertClass = 'alert-warning';
+                        alertIcon = '⚠️ Attenzione';
+                    } else if (alert.type === 'info') {
+                        alertClass = 'alert-info';
+                        alertIcon = 'ℹ️ Info';
+                    }
+                    
+                    html += `<div class="${alertClass}">`;
+                    html += `<strong>${alertIcon}</strong><br>`;
+                    html += alert.message;
+                    html += `</div>`;
+                });
+            }
+            
+            const primaryDdx = ddx.find(d => d.priority === 'primary');
+            const confidenceLevel = primaryDdx ? (primaryDdx.confidence === 'alta' ? 3 : primaryDdx.confidence === 'media' ? 2 : 1) : 0;
+            
+            html += `<div class="confidence-meter">`;
+            for (let i = 0; i < 3; i++) {
+                html += `<div class="confidence-bar ${i < confidenceLevel ? 'filled' : ''}"></div>`;
+            }
+            html += `</div>`;
+            html += `<p style="font-size: 0.9em; color: #666;">Livello di confidenza diagnostica basato su dati disponibili</p>`;
+            
+            html += `<div class="pattern-box">`;
+            html += `<h4>Pattern Istologico Riconosciuto:</h4>`;
+            patterns.forEach(p => {
+                html += `<p><strong>${p.name}</strong> (confidenza: ${p.confidence})<br>${p.description}`;
+                if (p.ihc && p.ihc.length > 0) {
+                    html += `<br><br><em style="color: #667eea;">Conferme immunoistochimiche:</em>`;
+                    p.ihc.forEach(i => html += `<br>✓ ${i}`);
+                }
+                html += `</p>`;
+            });
+            html += `</div>`;
+            
+            html += `<h4 style="margin-top: 20px;">Diagnosi Differenziale:</h4>`;
+            html += `<ul class="ddx-list">`;
+            ddx.forEach(d => {
+                const cssClass = d.priority === 'primary' ? 'ddx-primary' : d.priority === 'secondary' ? 'ddx-secondary' : 'ddx-unlikely';
+                html += `<li class="ddx-item ${cssClass}">`;
+                html += `<div><strong>${d.diagnosis}</strong> (${d.confidence})<br>`;
+                html += `<em>${d.pattern}</em>`;
+                if (d.supporting.length > 0) {
+                    html += `<br><small>+ ${d.supporting.join(', ')}</small>`;
+                }
+                html += `</div></li>`;
+            });
+            html += `</ul>`;
+            
+            if (gaps.length > 0) {
+                html += `<div class="gap-analysis">`;
+                html += `<h4>⚠️ Per Diagnosi Definitiva WHO 2022 Necessario:</h4>`;
+                html += `<ul>`;
+                gaps.forEach(g => html += `<li>${g}</li>`);
+                html += `</ul>`;
+                html += `</div>`;
+            }
+            
+            html += `<h4 style="margin-top: 20px;">📄 Testo per Referto:</h4>`;
+            html += `<div class="report-text">${reportText}</div>`;
+            html += `<button class="copy-btn" onclick="copyReport()">📋 Copia Referto</button>`;
+            
+            html += `<button class="btn-success" style="margin-top: 15px; width: 100%;" onclick="saveCase()">💾 Salva Caso per Follow-up</button>`;
+            
+            resultDiv.className = 'result show';
+            resultDiv.style.background = '#f8f9fa';
+            resultDiv.style.border = '2px solid #667eea';
+            resultDiv.innerHTML = html;
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function copyReport() {
+            const reportText = document.querySelector('.report-text').textContent;
+            navigator.clipboard.writeText(reportText).then(() => {
+                alert('✅ Referto copiato negli appunti!');
+            });
+        }
+        
+        function saveCase() {
+            const caseData = {
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                histology: {
+                    cellularity: document.getElementById('cellularity').value,
+                    cellularityPercent: document.getElementById('cellularity-percent').value,
+                    meRatio: document.getElementById('me_ratio').value,
+                    megakaryocyte: document.getElementById('megakaryocyte').value,
+                    proliferation: document.getElementById('proliferation').value,
+                    fibrosis: parseInt(document.getElementById('fibrosis').value),
+                    lymphoidPercent: document.getElementById('lymphoid-percent').value,
+                    lymphoidDistribution: document.getElementById('lymphoid-distribution').value
+                },
+                ihc: {
+                    cd34: document.getElementById('cd34').value,
+                    cd61: document.getElementById('cd61').value,
+                    cd3: document.getElementById('cd3').value,
+                    cd20: document.getElementById('cd20').value,
+                    perls: document.getElementById('perls').value
+                },
+                clinical: {
+                    age: document.getElementById('age').value,
+                    sex: document.getElementById('sex').value,
+                    diagnosis: document.getElementById('suspected-diagnosis').value || 'Non specificata'
+                }
+            };
+            
+            savedCases.push(caseData);
+            localStorage.setItem('nmc-cases', JSON.stringify(savedCases));
+            alert('✅ Caso salvato! Disponibile nella sezione Follow-up.');
+        }
+        
+        function loadSavedCases() {
+            const container = document.getElementById('cases-container');
+            
+            if (savedCases.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic;">Nessun caso salvato</p>';
+                return;
+            }
+            
+            let html = '';
+            savedCases.forEach((c, index) => {
+                html += `<div class="saved-case-item">`;
+                html += `<div class="case-info">`;
+                html += `<strong>${c.date}</strong> - ${c.clinical.diagnosis} - MF-${c.histology.fibrosis}`;
+                
+                if (c.histology.cellularityPercent) {
+                    html += ` - Cell: ${c.histology.cellularityPercent}%`;
+                }
+                
+                html += `<br><small>Cellularità: ${c.histology.cellularity}, Megacariociti: ${c.histology.megakaryocyte}</small>`;
+                
+                if (c.histology.meRatio) {
+                    html += `<br><small>M/E: ${c.histology.meRatio}</small>`;
+                }
+                
+                if (c.histology.lymphoidPercent && parseFloat(c.histology.lymphoidPercent) > 20) {
+                    html += `<br><small style="color: #dc3545; font-weight: 600;">⚠️ Linfociti: ${c.histology.lymphoidPercent}%</small>`;
+                }
+                
+                if (c.ihc && (c.ihc.cd34 || c.ihc.cd61 || c.ihc.perls)) {
+                    html += `<br><small style="color: #667eea;">IHC: `;
+                    const ihcList = [];
+                    if (c.ihc.cd34) ihcList.push(`CD34 ${c.ihc.cd34}`);
+                    if (c.ihc.cd61) ihcList.push(`CD61 ${c.ihc.cd61}`);
+                    if (c.ihc.perls) ihcList.push(`Perls ${c.ihc.perls}`);
+                    html += ihcList.join(', ');
+                    html += `</small>`;
+                }
+                
+                html += `</div>`;
+                html += `<div class="case-actions">`;
+                html += `<button class="small-btn" onclick="loadCaseForFollowup(${index})">Carica</button>`;
+                html += `<button class="small-btn btn-secondary" onclick="deleteCase(${index})">Elimina</button>`;
+                html += `</div>`;
+                html += `</div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function loadCaseForFollowup(index) {
+            const caseData = savedCases[index];
+            
+            document.getElementById('prev-date').value = caseData.date;
+            document.getElementById('prev-diagnosis').value = caseData.clinical.diagnosis;
+            document.getElementById('prev-fibrosis').value = caseData.histology.fibrosis;
+            document.getElementById('prev-cellularity').value = caseData.histology.cellularity;
+            
+            let alertMessage = '✅ Caso caricato! Inserisci ora i dati della biopsia attuale.';
+            if (caseData.histology.cellularityPercent) {
+                alertMessage += `\n\nCellularità precedente: ${caseData.histology.cellularityPercent}%`;
+            }
+            if (caseData.histology.meRatio) {
+                alertMessage += `\nM/E precedente: ${caseData.histology.meRatio}`;
+            }
+            
+            alert(alertMessage);
+        }
+        
+        function deleteCase(index) {
+            if (confirm('Eliminare questo caso?')) {
+                savedCases.splice(index, 1);
+                localStorage.setItem('nmc-cases', JSON.stringify(savedCases));
+                loadSavedCases();
+            }
+        }
+        
+        function compareFollowup() {
+            const prevDate = document.getElementById('prev-date').value;
+            const prevDiagnosis = document.getElementById('prev-diagnosis').value;
+            const prevFibrosis = parseInt(document.getElementById('prev-fibrosis').value);
+            const prevCellularity = document.getElementById('prev-cellularity').value;
+            
+            const currCellularity = document.getElementById('curr-cellularity').value;
+            const currFibrosis = document.getElementById('curr-fibrosis').value;
+            const currMegakaryocyte = document.getElementById('curr-megakaryocyte').value;
+            const currProliferation = document.getElementById('curr-proliferation').value;
+            const currBlasts = document.getElementById('curr-blasts').value;
+            
+            if (!prevDate || !prevDiagnosis || !currCellularity || currFibrosis === '' || !currMegakaryocyte || !currProliferation) {
+                alert('Compila tutti i campi obbligatori!');
+                return;
+            }
+            
+            const currFibrosisNum = parseInt(currFibrosis);
+            
+            const prevDateObj = new Date(prevDate);
+            const currDateObj = new Date();
+            const monthsDiff = Math.round((currDateObj - prevDateObj) / (1000 * 60 * 60 * 24 * 30));
+            
+            const fibrosisChange = currFibrosisNum - prevFibrosis;
+            const cellularityChange = currCellularity !== prevCellularity;
+            const blastsIncreased = currBlasts && parseFloat(currBlasts) >= 10;
+            
+            displayFollowupResults(prevDiagnosis, prevFibrosis, currFibrosisNum, fibrosisChange, monthsDiff, cellularityChange, blastsIncreased, currMegakaryocyte, currProliferation);
+        }
+        
+        function displayFollowupResults(prevDx, prevFib, currFib, fibChange, months, cellChange, blasts, megak, prolif) {
+            const resultDiv = document.getElementById('result-followup');
+            
+            let html = `<h3>📊 Analisi Follow-up</h3>`;
+            
+            html += `<table class="comparison-table">`;
+            html += `<tr><th>Parametro</th><th>Precedente</th><th>Attuale</th><th>Variazione</th></tr>`;
+            html += `<tr><td>Fibrosi</td><td>MF-${prevFib}</td><td>MF-${currFib}</td><td>${fibChange > 0 ? '⬆️ +' + fibChange : fibChange < 0 ? '⬇️ ' + fibChange : '➡️ Stabile'}</td></tr>`;
+            html += `<tr><td colspan="4"><strong>Intervallo:</strong> ${months} mesi</td></tr>`;
+            html += `</table>`;
+            
+            if (fibChange >= 2 || blasts) {
+                html += `<div class="progression-alert">`;
+                html += `<strong>⚠️ PROGRESSIONE RILEVATA</strong><br>`;
+                if (fibChange >= 2) {
+                    html += `Aumento significativo della fibrosi (${fibChange} gradi in ${months} mesi).<br>`;
+                    if (prevDx === 'ET') html += `Compatibile con evoluzione a <strong>post-ET mielofibrosi</strong>.<br>`;
+                    if (prevDx === 'PV') html += `Compatibile con evoluzione a <strong>post-PV mielofibrosi (spent phase)</strong>.<br>`;
+                }
+                if (blasts) {
+                    html += `Presenza di blasti aumentati: valutare possibile <strong>trasformazione blastica</strong>.<br>`;
+                }
+                html += `<br><strong>Raccomandazioni:</strong> Correlazione clinico-molecolare urgente, NGS panel (ASXL1, TP53, SRSF2), valutazione terapeutica.`;
+                html += `</div>`;
+            } else if (fibChange === 1) {
+                html += `<div class="gap-analysis">`;
+                html += `<strong>⚠️ Lieve Progressione</strong><br>`;
+                html += `Incremento di 1 grado della fibrosi in ${months} mesi. Monitorare evoluzione con BOM di controllo tra 12-18 mesi.`;
+                html += `</div>`;
+            } else if (fibChange === 0) {
+                html += `<div class="stable-alert">`;
+                html += `<strong>✅ Quadro Stabile</strong><br>`;
+                html += `Fibrosi invariata (MF-${currFib}). Continuare follow-up secondo protocollo standard.`;
+                html += `</div>`;
+            } else {
+                html += `<div class="stable-alert">`;
+                html += `<strong>✅ Miglioramento</strong><br>`;
+                html += `Riduzione della fibrosi (insolito, verificare campionamento e/o effetto terapeutico).`;
+                html += `</div>`;
+            }
+            
+            html += `<div class="pattern-box">`;
+            html += `<h4>Istologia Attuale:</h4>`;
+            html += `<p>Megacariociti: ${translateMegakaryocyte(megak)}<br>`;
+            html += `Proliferazione: ${translateProliferation(prolif)}</p>`;
+            html += `</div>`;
+            
+            let report = `FOLLOW-UP BIOPSIA OSTEOMIDOLLARE:\n\n`;
+            report += `Diagnosi precedente: ${prevDx} (${months} mesi fa)\n`;
+            report += `Fibrosi precedente: MF-${prevFib} → Attuale: MF-${currFib}\n\n`;
+            
+            if (fibChange >= 2) {
+                report += `CONCLUSIONI:\n`;
+                report += `Progressione della fibrosi midollare (${fibChange} gradi in ${months} mesi).\n`;
+                if (prevDx === 'ET' || prevDx === 'PV') {
+                    report += `Quadro compatibile con evoluzione fibrotica della ${prevDx} (post-${prevDx} mielofibrosi).\n`;
+                }
+                report += `\nSi raccomanda correlazione clinica e rivalutazione molecolare completa.`;
+            } else if (fibChange === 0) {
+                report += `CONCLUSIONI:\nQuadro istologico sostanzialmente sovrapponibile al precedente esame. Fibrosi stabile.`;
+            }
+            
+            html += `<h4 style="margin-top: 20px;">📄 Testo per Referto Follow-up:</h4>`;
+            html += `<div class="report-text">${report}</div>`;
+            html += `<button class="copy-btn" onclick="copyFollowupReport()">📋 Copia Referto</button>`;
+            
+            resultDiv.className = 'result show';
+            resultDiv.style.background = '#f8f9fa';
+            resultDiv.style.border = '2px solid #667eea';
+            resultDiv.innerHTML = html;
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function copyFollowupReport() {
+            const reportText = document.querySelector('#result-followup .report-text').textContent;
+            navigator.clipboard.writeText(reportText).then(() => {
+                alert('✅ Referto follow-up copiato!');
+            });
+        }
+        
+        function resetForm() {
+            document.getElementById('tab-new').querySelectorAll('input, select, textarea').forEach(el => {
+                if (el.type === 'checkbox') el.checked = false;
+                else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                else el.value = '';
+            });
+            document.getElementById('kappa_lambda').style.display = 'none';
+            document.getElementById('result-new').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
