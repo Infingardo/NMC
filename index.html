@@ -413,6 +413,29 @@
         
         <!-- TAB PRIMA DIAGNOSI -->
         <div id="tab-new" class="tab-content active">
+            <!-- DATI ANAGRAFICI -->
+            <div class="section" style="background: #e8f4f8; border-left-color: #17a2b8;">
+                <h2>👤 Dati Anagrafici</h2>
+                
+                <div class="grid">
+                    <div class="input-group">
+                        <label>Età (anni):</label>
+                        <input type="number" id="age" min="0" max="120" placeholder="Es: 65">
+                        <p class="info-text">Necessaria per calcolo automatico cellularità attesa</p>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Sesso:</label>
+                        <select id="sex">
+                            <option value="">-- Non specificato --</option>
+                            <option value="M">Maschio</option>
+                            <option value="F">Femmina</option>
+                        </select>
+                        <p class="info-text">Utile per valutazione PV (Hb >16.5 M, >16.0 F)</p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- ISTOLOGIA - OBBLIGATORIA -->
             <div class="section required">
                 <h2>🔬 Valutazione Istologica <span class="badge badge-required">OBBLIGATORIO</span></h2>
@@ -432,6 +455,7 @@
                             <option value="increased">Aumentata per età</option>
                             <option value="decreased">Diminuita per età</option>
                         </select>
+                        <p class="info-text">Auto-compilato se inserisci età e %</p>
                     </div>
                 </div>
                 
@@ -692,22 +716,6 @@
                     </div>
                 </div>
                 
-                <div class="grid">
-                    <div class="input-group">
-                        <label>Età:</label>
-                        <input type="number" id="age" min="0" max="120" placeholder="Anni">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Sesso:</label>
-                        <select id="sex">
-                            <option value="">-- Non specificato --</option>
-                            <option value="M">Maschio</option>
-                            <option value="F">Femmina</option>
-                        </select>
-                    </div>
-                </div>
-                
                 <div class="checkbox-group">
                     <input type="checkbox" id="splenomegaly">
                     <label for="splenomegaly">Splenomegalia</label>
@@ -899,24 +907,72 @@
         
         function updateCellularityHint() {
             const age = document.getElementById('age').value;
+            const cellularityPercent = document.getElementById('cellularity-percent').value;
             const hintElement = document.getElementById('cellularity-hint');
+            const cellularitySelect = document.getElementById('cellularity');
             
             if (age && age > 0 && age <= 120) {
                 const expectedCellularity = Math.max(0, 100 - parseInt(age));
-                hintElement.textContent = `Cellularità attesa per età ${age} anni: ~${expectedCellularity}% (formula: 100 - età)`;
+                
+                // Se c'è anche la % inserita, calcola se è normale/aumentata/diminuita
+                if (cellularityPercent && cellularityPercent > 0) {
+                    const percent = parseFloat(cellularityPercent);
+                    const lowerBound = expectedCellularity - 10; // Range ±10%
+                    const upperBound = expectedCellularity + 10;
+                    
+                    let assessment = '';
+                    let color = '';
+                    let autoValue = '';
+                    
+                    if (percent >= lowerBound && percent <= upperBound) {
+                        assessment = '✓ NORMALE per età';
+                        color = '#28a745';
+                        autoValue = 'normal';
+                    } else if (percent > upperBound) {
+                        assessment = '⬆️ AUMENTATA per età';
+                        color = '#dc3545';
+                        autoValue = 'increased';
+                    } else {
+                        assessment = '⬇️ DIMINUITA per età';
+                        color = '#ffc107';
+                        autoValue = 'decreased';
+                    }
+                    
+                    hintElement.innerHTML = `Cellularità attesa per età ${age} anni: ~${expectedCellularity}% (±10%)<br><strong style="color: ${color}">${assessment}</strong>`;
+                    
+                    // Auto-seleziona il dropdown
+                    if (cellularitySelect.value === '' || cellularitySelect.value !== autoValue) {
+                        cellularitySelect.value = autoValue;
+                        cellularitySelect.style.borderColor = color;
+                        cellularitySelect.style.borderWidth = '3px';
+                    }
+                } else {
+                    // Solo età, nessuna % inserita
+                    hintElement.textContent = `Cellularità attesa per età ${age} anni: ~${expectedCellularity}% (formula: 100 - età, range ±10%)`;
+                    cellularitySelect.style.borderColor = '#ddd';
+                    cellularitySelect.style.borderWidth = '2px';
+                }
+                
                 hintElement.style.color = '#667eea';
                 hintElement.style.fontWeight = '600';
             } else {
                 hintElement.textContent = 'Cellularità attesa per età: compila età per suggerimento';
                 hintElement.style.color = '#666';
                 hintElement.style.fontWeight = 'normal';
+                cellularitySelect.style.borderColor = '#ddd';
+                cellularitySelect.style.borderWidth = '2px';
             }
         }
         
         document.addEventListener('DOMContentLoaded', function() {
             const ageInput = document.getElementById('age');
+            const cellPercentInput = document.getElementById('cellularity-percent');
+            
             if (ageInput) {
                 ageInput.addEventListener('input', updateCellularityHint);
+            }
+            if (cellPercentInput) {
+                cellPercentInput.addEventListener('input', updateCellularityHint);
             }
         });
         
@@ -1380,11 +1436,34 @@
                     report += `\nDati clinico-laboratoristici supportanti:\n`;
                     primary.supporting.forEach(s => report += `- ${s}\n`);
                 }
+                
+                // DIAGNOSI PROPOSTA
+                report += `\n`;
+                report += `DIAGNOSI MORFOLOGICA: ${primary.diagnosis.toUpperCase()}\n`;
+                
+                // DDx se ci sono diagnosi secondarie
+                const secondaryDdx = ddx.filter(d => d.priority === 'secondary');
+                if (secondaryDdx.length > 0) {
+                    report += `\nDIAGNOSI DIFFERENZIALE: `;
+                    report += secondaryDdx.map(d => d.diagnosis).join(', ');
+                    report += `\n`;
+                }
             } else {
                 report += `${patterns[0].description}.\n`;
+                report += `\nQUADRO MORFOLOGICO NON DIAGNOSTICO per neoplasia mieloproliferativa specifica.\n`;
             }
             
-            report += `\nNOTA: Per diagnosi definitiva secondo criteri WHO 2022, necessaria integrazione con dati clinici, ematochimici e molecolari completi.`;
+            report += `\n${'='.repeat(70)}\n`;
+            report += `NOTA IMPORTANTE:\n`;
+            report += `La diagnosi definitiva di neoplasia mieloproliferativa cronica secondo\n`;
+            report += `i criteri WHO 2022 richiede OBBLIGATORIAMENTE l'integrazione con:\n`;
+            report += `- Dati clinici (splenomegalia, sintomi costituzionali, storia clinica)\n`;
+            report += `- Emocromo completo (Hb, Ht, PLT, WBC con formula)\n`;
+            report += `- Profilo molecolare (JAK2 V617F/exon 12, CALR, MPL)\n`;
+            report += `- Eventuale citogenetica e NGS panel se indicati\n`;
+            report += `\nLa presente diagnosi morfologica deve essere correlata con i suddetti dati\n`;
+            report += `per la formulazione della diagnosi definitiva e stadiazione.\n`;
+            report += `${'='.repeat(70)}`;
             
             return report;
         }
