@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMC Diagnostic Tool - Pattern Recognition & WHO 2022</title>
+    <title>NMC Diagnostic Tool v2.1 - Pattern Recognition & WHO 2022</title>
     <style>
         * {
             margin: 0;
@@ -413,7 +413,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔬 NMC Diagnostic Tool</h1>
+            <h1>🔬 NMC Diagnostic Tool v2.1</h1>
             <p>Pattern Recognition & WHO 2022 Formal Criteria - Pannello IHC Completo</p>
         </div>
         
@@ -758,7 +758,7 @@
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="triple_neg">
-                        <label for="triple_neg">Triple-negative</label>
+                        <label for="triple_neg">Triple-negative (testato, tutti negativi)</label>
                     </div>
                 </div>
                 
@@ -893,18 +893,18 @@
                         <td>Ridotto/invertito</td>
                     </tr>
                     <tr>
-                        <td><strong>PMF</strong></td>
+                        <td><strong>Pre-PMF</strong></td>
+                        <td>Clustering + atipia</td>
+                        <td>Variabile</td>
+                        <td>MF-0/1</td>
+                        <td>Variabile</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PMF overt</strong></td>
                         <td>Clustering + atipia</td>
                         <td>Variabile</td>
                         <td>MF-2/3</td>
                         <td>Aumentato</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Pre-PMF</strong></td>
-                        <td>Clustering</td>
-                        <td>Variabile</td>
-                        <td>MF-0/1</td>
-                        <td>Variabile</td>
                     </tr>
                 </table>
             </div>
@@ -931,22 +931,40 @@
                     <li>Piastrine ≥450 ×10⁹/L</li>
                     <li>Biopsia: megacariociti iperlobulati maturi</li>
                     <li>Esclusione PV, PMF, CML, MDS</li>
-                    <li>Mutazione JAK2, CALR o MPL</li>
+                    <li>Mutazione JAK2, CALR o MPL (o altra mutazione clonale / esclusione cause reattive)</li>
                 </ol>
             </div>
             
             <div class="pattern-box who-box">
-                <h4>Criteri WHO 2022 - Mielofibrosi Primaria</h4>
-                <p><strong>Diagnosi: ≥3 criteri maggiori + ≥1 minore</strong></p>
+                <h4>Criteri WHO 2022 - Pre-PMF</h4>
+                <p><strong>Diagnosi: Tutti i criteri maggiori + ≥1 minore</strong></p>
                 <p><strong>Criteri Maggiori:</strong></p>
                 <ul>
-                    <li>Clustering megacariociti con atipia + fibrosi MF-2/3</li>
+                    <li>Proliferazione megacariocitaria con atipia, SENZA fibrosi reticolare >MF-1</li>
                     <li>Esclusione PV, ET, CML, MDS</li>
                     <li>Mutazione JAK2, CALR, MPL o altra mutazione clonale</li>
                 </ul>
                 <p><strong>Criteri Minori:</strong></p>
                 <ul>
-                    <li>Anemia</li>
+                    <li>Anemia non attribuibile a comorbidità</li>
+                    <li>Leucocitosi ≥11 ×10⁹/L</li>
+                    <li>Splenomegalia palpabile</li>
+                    <li>LDH elevato</li>
+                </ul>
+            </div>
+            
+            <div class="pattern-box who-box">
+                <h4>Criteri WHO 2022 - Mielofibrosi Primaria (overt)</h4>
+                <p><strong>Diagnosi: Tutti i criteri maggiori + ≥1 minore</strong></p>
+                <p><strong>Criteri Maggiori:</strong></p>
+                <ul>
+                    <li>Proliferazione megacariocitaria con atipia + fibrosi MF-2/3</li>
+                    <li>Esclusione PV, ET, CML, MDS</li>
+                    <li>Mutazione JAK2, CALR, MPL o altra mutazione clonale</li>
+                </ul>
+                <p><strong>Criteri Minori:</strong></p>
+                <ul>
+                    <li>Anemia non attribuibile a comorbidità</li>
                     <li>Leucocitosi ≥11 ×10⁹/L</li>
                     <li>Splenomegalia palpabile</li>
                     <li>LDH elevato</li>
@@ -1096,13 +1114,14 @@
             const hintElement = document.getElementById('cellularity-hint');
             const cellularitySelect = document.getElementById('cellularity');
             
+            // FIX v2.1: Corrette condizioni per range 60-70 anni
             function getCellularityRange(age) {
                 if (age < 2) return { min: 45, max: 85, mean: 79.8, label: '<2 anni (fisiologicamente ipercellulare)' };
                 if (age < 5) return { min: 50, max: 70, mean: 59.1, label: '2-5 anni' };
                 if (age < 20) return { min: 45, max: 85, mean: 65, label: '<20 anni' };
-                if (age < 40) return { min: 40, max: 70, mean: 55, label: '20-40 anni' };
-                if (age < 60) return { min: 35, max: 65, mean: 50, label: '40-60 anni' };
-                if (age < 70) return { min: 30, max: 60, mean: 45, label: '60-70 anni' };
+                if (age <= 40) return { min: 40, max: 70, mean: 55, label: '20-40 anni' };
+                if (age <= 60) return { min: 35, max: 65, mean: 50, label: '40-60 anni' };
+                if (age <= 70) return { min: 30, max: 60, mean: 45, label: '60-70 anni' };
                 return { min: 30, max: 60, mean: 45, label: '>70 anni (STABILE)' };
             }
             
@@ -1258,10 +1277,19 @@
             }
             
             // Criterio 3: Esclusione PV, PMF, CML, MDS
-            const pvFeatures = (data.proliferation === 'panmyelosis' && data.me_ratio === 'inverted');
-            const pmfFeatures = (data.fibrosis >= 2);
+            // FIX v2.1: Esclusione PV basata su Hb/Hct, non solo morfologia
+            const hbThreshold = data.sex === 'M' ? 16.5 : 16.0;
+            const hctThreshold = data.sex === 'M' ? 49 : 48;
+            const pvFeatures = (data.hb && data.hb > hbThreshold) || (data.hct && data.hct > hctThreshold);
+            const pmfFeatures = (data.fibrosis !== null && data.fibrosis >= 2);
             const cmlFeatures = (data.cytogenetics === 't9_22');
             const mdsFeatures = (data.blasts_percent >= 5);
+            
+            let exclusionReasons = [];
+            if (pvFeatures) exclusionReasons.push('Hb/Hct compatibile con PV');
+            if (pmfFeatures) exclusionReasons.push('Fibrosi MF-2/3');
+            if (cmlFeatures) exclusionReasons.push('t(9;22) presente');
+            if (mdsFeatures) exclusionReasons.push('Blasti ≥5%');
             
             if (!pvFeatures && !pmfFeatures && !cmlFeatures && !mdsFeatures) {
                 metCount++;
@@ -1274,11 +1302,12 @@
                 criteria.push({
                     number: 3,
                     met: false,
-                    text: 'Presenza features di altre NMC/MDS'
+                    text: `Non escludibile: ${exclusionReasons.join('; ')}`
                 });
             }
             
-            // Criterio 4: Mutazione JAK2/CALR/MPL
+            // Criterio 4: Mutazione JAK2/CALR/MPL (o triple-neg con esclusione reattiva)
+            // FIX v2.1: Integrato triple-negative
             if (data.jak2 || data.calr || data.mpl) {
                 metCount++;
                 let muts = [];
@@ -1290,16 +1319,29 @@
                     met: true,
                     text: `Mutazione driver: ${muts.join(', ')}`
                 });
+            } else if (data.triple_neg) {
+                // Triple-negative: può essere ET se esclude cause reattive + ha altra mutazione clonale
+                criteria.push({
+                    number: 4,
+                    met: null, // parzialmente soddisfatto
+                    text: 'Triple-negative confermato: richiede esclusione trombocitosi reattiva o altra mutazione clonale (ASXL1, EZH2, TET2, IDH1/2, SRSF2, SF3B1)'
+                });
             } else {
                 criteria.push({
                     number: 4,
                     met: false,
-                    text: 'Nessuna mutazione driver (JAK2/CALR/MPL)'
+                    text: 'Nessuna mutazione driver (JAK2/CALR/MPL) - test non eseguito o negativo'
                 });
             }
             
+            // Per triple-neg il criterio 4 è "parziale" - non blocca diagnosi ma richiede attenzione
+            const effectiveMetCount = data.triple_neg && !data.jak2 && !data.calr && !data.mpl ? metCount : metCount;
+            const diagnosisStatus = metCount === 4 ? "ET_CONFERMATO" : 
+                                   (metCount === 3 && data.triple_neg) ? "ET_PROBABILE_TRIPLE_NEG" :
+                                   "ET_NON_CONFERMATO";
+            
             return {
-                diagnosis: metCount === 4 ? "ET_CONFERMATO" : "ET_NON_CONFERMATO",
+                diagnosis: diagnosisStatus,
                 criteriaMet: metCount,
                 totalCriteria: 4,
                 criteria,
@@ -1307,35 +1349,47 @@
             };
         }
         
-        function calculateWHOPMFScore(data) {
+        // FIX v2.1: Aggiunta funzione separata per Pre-PMF WHO 2022
+        function calculateWHOPrePMFScore(data) {
             let majorMet = 0;
             let minorMet = 0;
             const majorCriteria = [];
             const minorCriteria = [];
             
-            // CRITERI MAGGIORI
+            // CRITERI MAGGIORI PRE-PMF
             
-            // Maggiore 1: Clustering megacariociti con atipia + fibrosi MF-2/3
-            if (data.megakaryocyte === 'clustered' && data.fibrosis >= 2) {
+            // Maggiore 1: Proliferazione megacariocitaria con atipia, SENZA fibrosi >MF-1
+            const hasMegaAtypia = (data.megakaryocyte === 'clustered' || data.megakaryocyte === 'pleomorphic');
+            const lowFibrosis = (data.fibrosis === null || data.fibrosis <= 1);
+            
+            if (hasMegaAtypia && lowFibrosis) {
                 majorMet++;
                 majorCriteria.push({
                     number: 1,
                     met: true,
-                    text: `Clustering megacariociti + fibrosi MF-${data.fibrosis}`
+                    text: `Proliferazione megacariocitaria atipica con fibrosi ≤MF-1 (MF-${data.fibrosis !== null ? data.fibrosis : 'N/V'})`
+                });
+            } else if (hasMegaAtypia && !lowFibrosis) {
+                majorCriteria.push({
+                    number: 1,
+                    met: false,
+                    text: `Fibrosi MF-${data.fibrosis} → PMF overt, non Pre-PMF`
                 });
             } else {
                 majorCriteria.push({
                     number: 1,
                     met: false,
-                    text: 'Clustering e/o fibrosi insufficienti'
+                    text: 'Morfologia megacariociti non tipica per Pre-PMF'
                 });
             }
             
             // Maggiore 2: Esclusione PV, ET, CML, MDS
-            const pvFeatures = (data.proliferation === 'panmyelosis' && data.me_ratio === 'inverted' && data.fibrosis < 2);
-            const etFeatures = (data.megakaryocyte === 'hyperlobulated' && data.fibrosis < 2);
+            const hbThreshold = data.sex === 'M' ? 16.5 : 16.0;
+            const hctThreshold = data.sex === 'M' ? 49 : 48;
+            const pvFeatures = (data.hb && data.hb > hbThreshold) || (data.hct && data.hct > hctThreshold);
+            const etFeatures = (data.megakaryocyte === 'hyperlobulated' && data.plt >= 450);
             const cmlFeatures = (data.cytogenetics === 't9_22');
-            const mdsFeatures = (data.blasts_percent >= 5 && data.blasts_percent < 20);
+            const mdsFeatures = (data.blasts_percent >= 5);
             
             if (!pvFeatures && !etFeatures && !cmlFeatures && !mdsFeatures) {
                 majorMet++;
@@ -1345,10 +1399,15 @@
                     text: 'Esclusione PV, ET, CML, MDS soddisfatta'
                 });
             } else {
+                let reasons = [];
+                if (pvFeatures) reasons.push('PV (Hb/Hct elevati)');
+                if (etFeatures) reasons.push('ET (megacariociti iperlobulati + PLT elevate)');
+                if (cmlFeatures) reasons.push('CML (t(9;22))');
+                if (mdsFeatures) reasons.push('MDS (blasti ≥5%)');
                 majorCriteria.push({
                     number: 2,
                     met: false,
-                    text: 'Presenza features di altre NMC/MDS'
+                    text: `Features suggestive di: ${reasons.join(', ')}`
                 });
             }
             
@@ -1363,6 +1422,147 @@
                     number: 3,
                     met: true,
                     text: `Mutazione clonale: ${muts.join(', ')}`
+                });
+            } else if (data.triple_neg) {
+                majorCriteria.push({
+                    number: 3,
+                    met: null,
+                    text: 'Triple-negative: richiede altra mutazione clonale documentata'
+                });
+            } else {
+                majorCriteria.push({
+                    number: 3,
+                    met: false,
+                    text: 'Nessuna mutazione driver documentata'
+                });
+            }
+            
+            // CRITERI MINORI (stessi di PMF overt)
+            
+            // Minore 1: Anemia
+            if (data.anemia) {
+                minorMet++;
+                minorCriteria.push({ number: 1, met: true, text: 'Anemia presente' });
+            } else {
+                minorCriteria.push({ number: 1, met: false, text: 'Anemia non documentata' });
+            }
+            
+            // Minore 2: Leucocitosi ≥11 ×10⁹/L
+            if (data.wbc && data.wbc >= 11) {
+                minorMet++;
+                minorCriteria.push({ number: 2, met: true, text: `Leucocitosi ${data.wbc} ×10⁹/L (≥11)` });
+            } else {
+                minorCriteria.push({ number: 2, met: false, text: `WBC ${data.wbc || 'N/A'} ×10⁹/L` });
+            }
+            
+            // Minore 3: Splenomegalia
+            if (data.splenomegaly) {
+                minorMet++;
+                minorCriteria.push({ number: 3, met: true, text: 'Splenomegalia palpabile' });
+            } else {
+                minorCriteria.push({ number: 3, met: false, text: 'Splenomegalia non documentata' });
+            }
+            
+            // Minore 4: LDH elevato
+            if (data.ldh_elevated) {
+                minorMet++;
+                minorCriteria.push({ number: 4, met: true, text: 'LDH elevato' });
+            } else {
+                minorCriteria.push({ number: 4, met: false, text: 'LDH non elevato o non valutato' });
+            }
+            
+            // Diagnosi Pre-PMF: tutti i maggiori + ≥1 minore
+            const diagnosis = (majorMet >= 3 && minorMet >= 1) ? "PRE_PMF_CONFERMATO" :
+                             (majorMet >= 2 && minorMet >= 1) ? "PRE_PMF_PROBABILE" :
+                             "PRE_PMF_ESCLUSO";
+            
+            return {
+                diagnosis,
+                majorMet,
+                minorMet,
+                totalMajor: 3,
+                totalMinor: 4,
+                majorCriteria,
+                minorCriteria,
+                summary: `Criteri maggiori: ${majorMet}/3, Criteri minori: ${minorMet}/4`
+            };
+        }
+        
+        function calculateWHOPMFScore(data) {
+            let majorMet = 0;
+            let minorMet = 0;
+            const majorCriteria = [];
+            const minorCriteria = [];
+            
+            // CRITERI MAGGIORI PMF OVERT
+            
+            // Maggiore 1: Clustering megacariociti con atipia + fibrosi MF-2/3
+            if (data.megakaryocyte === 'clustered' && data.fibrosis !== null && data.fibrosis >= 2) {
+                majorMet++;
+                majorCriteria.push({
+                    number: 1,
+                    met: true,
+                    text: `Clustering megacariociti + fibrosi MF-${data.fibrosis}`
+                });
+            } else if (data.megakaryocyte === 'clustered' && (data.fibrosis === null || data.fibrosis < 2)) {
+                majorCriteria.push({
+                    number: 1,
+                    met: false,
+                    text: `Clustering presente ma fibrosi insufficiente (MF-${data.fibrosis !== null ? data.fibrosis : 'N/V'}) → valutare Pre-PMF`
+                });
+            } else {
+                majorCriteria.push({
+                    number: 1,
+                    met: false,
+                    text: 'Clustering e/o fibrosi insufficienti'
+                });
+            }
+            
+            // Maggiore 2: Esclusione PV, ET, CML, MDS
+            const hbThreshold = data.sex === 'M' ? 16.5 : 16.0;
+            const hctThreshold = data.sex === 'M' ? 49 : 48;
+            const pvFeatures = (data.hb && data.hb > hbThreshold) || (data.hct && data.hct > hctThreshold);
+            // Per PMF non escludiamo più ET con criterio morfologico perché la fibrosi domina
+            const cmlFeatures = (data.cytogenetics === 't9_22');
+            const mdsFeatures = (data.blasts_percent >= 5 && data.blasts_percent < 20);
+            
+            if (!pvFeatures && !cmlFeatures && !mdsFeatures) {
+                majorMet++;
+                majorCriteria.push({
+                    number: 2,
+                    met: true,
+                    text: 'Esclusione PV, CML, MDS soddisfatta'
+                });
+            } else {
+                let reasons = [];
+                if (pvFeatures) reasons.push('PV');
+                if (cmlFeatures) reasons.push('CML');
+                if (mdsFeatures) reasons.push('MDS');
+                majorCriteria.push({
+                    number: 2,
+                    met: false,
+                    text: `Features suggestive di: ${reasons.join(', ')}`
+                });
+            }
+            
+            // Maggiore 3: Mutazione JAK2, CALR, MPL o altra mutazione clonale
+            if (data.jak2 || data.calr || data.mpl) {
+                majorMet++;
+                let muts = [];
+                if (data.jak2) muts.push('JAK2');
+                if (data.calr) muts.push('CALR');
+                if (data.mpl) muts.push('MPL');
+                majorCriteria.push({
+                    number: 3,
+                    met: true,
+                    text: `Mutazione clonale: ${muts.join(', ')}`
+                });
+            } else if (data.triple_neg) {
+                // FIX v2.1: Triple-negative gestito
+                majorCriteria.push({
+                    number: 3,
+                    met: null,
+                    text: 'Triple-negative: richiede altra mutazione clonale documentata (ASXL1, EZH2, ecc.) o esclusione fibrosi reattiva'
                 });
             } else {
                 majorCriteria.push({
@@ -1445,9 +1645,9 @@
                 text: 'Leucoeritroblastosi: non valutabile (dato non disponibile)'
             });
             
-            // Diagnosi: ≥3 maggiori + ≥1 minore
+            // Diagnosi PMF overt: tutti i maggiori + ≥1 minore
             const diagnosis = (majorMet >= 3 && minorMet >= 1) ? "PMF_CONFERMATO" :
-                             (majorMet >= 2 || (data.fibrosis === 1 && data.megakaryocyte === 'clustered')) ? "PRE_PMF_SOSPETTO" :
+                             (majorMet >= 2 && minorMet >= 1) ? "PMF_PROBABILE" :
                              "PMF_ESCLUSO";
             
             return {
@@ -1458,7 +1658,7 @@
                 totalMinor: 5,
                 majorCriteria,
                 minorCriteria,
-                summary: `Criteri maggiori: ${majorMet}/3, Criteri minori: ${minorMet}/5 (richiesto ≥3 maggiori + ≥1 minore)`
+                summary: `Criteri maggiori: ${majorMet}/3, Criteri minori: ${minorMet}/5 (richiesto tutti maggiori + ≥1 minore)`
             };
         }
         
@@ -1480,7 +1680,7 @@
                 reasoning.push({ text: 'Proliferazione megacariocitica', points: '+30', type: 'positive' });
             }
             
-            if (data.fibrosis <= 1) {
+            if (data.fibrosis === null || data.fibrosis <= 1) {
                 score += 25;
                 reasoning.push({ text: 'Assenza fibrosi o MF-1 minima', points: '+25', type: 'positive' });
             }
@@ -1503,6 +1703,13 @@
                 reasoning.push({ text: 'M/E ridotto suggerisce PV, non ET', points: '-20', type: 'negative' });
             }
             
+            // FIX v2.1: Esclusione PV su base ematologica
+            const hbThreshold = data.sex === 'M' ? 16.5 : 16.0;
+            if (data.hb && data.hb > hbThreshold) {
+                score -= 40;
+                reasoning.push({ text: `Hb ${data.hb} g/dL → suggestivo PV, non ET`, points: '-40', type: 'negative' });
+            }
+            
             if (data.cd14 === 'strong') {
                 score -= 30;
                 reasoning.push({ text: 'CD14 strong → LMMC suspect', points: '-30', type: 'negative' });
@@ -1511,6 +1718,12 @@
             if (data.lymphoid_percent > 20) {
                 score -= 25;
                 reasoning.push({ text: 'Componente linfoide aumentata', points: '-25', type: 'negative' });
+            }
+            
+            // FIX v2.1: Triple-negative
+            if (data.triple_neg && !data.jak2 && !data.calr && !data.mpl) {
+                score -= 10;
+                reasoning.push({ text: 'Triple-negative: richiede conferma clonalità', points: '-10', type: 'negative' });
             }
             
             return { score: Math.max(0, score), reasoning };
@@ -1553,12 +1766,14 @@
                 reasoning.push({ text: '✓✓ JAK2 V617F+ (chief criterion)', points: '+20', type: 'positive' });
             }
             
-            if (data.hb > (data.sex === 'M' ? 16.5 : 16.0) || data.hct > (data.sex === 'M' ? 49 : 48)) {
+            const hbThreshold = data.sex === 'M' ? 16.5 : 16.0;
+            const hctThreshold = data.sex === 'M' ? 49 : 48;
+            if ((data.hb && data.hb > hbThreshold) || (data.hct && data.hct > hctThreshold)) {
                 score += 15;
                 reasoning.push({ text: 'Hb/Hct >soglia PV', points: '+15', type: 'positive' });
             }
             
-            if (data.fibrosis >= 2) {
+            if (data.fibrosis !== null && data.fibrosis >= 2) {
                 score -= 40;
                 reasoning.push({ text: 'Fibrosi marcata → PMF, non PV', points: '-40', type: 'negative' });
             }
@@ -1580,7 +1795,7 @@
                 reasoning.push({ text: 'Clustering megacariociti con atipia', points: '+35', type: 'positive' });
             }
             
-            if (data.fibrosis >= 2) {
+            if (data.fibrosis !== null && data.fibrosis >= 2) {
                 score += 40;
                 reasoning.push({ text: `Fibrosi marcata MF-${data.fibrosis}`, points: '+40', type: 'positive' });
             }
@@ -1600,7 +1815,13 @@
                 reasoning.push({ text: 'E-caderina ridotto (eritropoiesi inefficace PMF)', points: '+20', type: 'positive' });
             }
             
-            if (data.fibrosis === 0 || (data.fibrosis === 1 && data.cd61 !== 'clustered')) {
+            // FIX v2.1: Triple-negative in PMF
+            if (data.triple_neg && !data.jak2 && !data.calr && !data.mpl) {
+                score -= 15;
+                reasoning.push({ text: 'Triple-negative: escludere fibrosi secondaria', points: '-15', type: 'negative' });
+            }
+            
+            if (data.fibrosis === null || (data.fibrosis <= 1 && data.cd61 !== 'clustered')) {
                 score -= 40;
                 reasoning.push({ text: 'Fibrosi minima senza atipia → Pre-PMF/ET', points: '-40', type: 'negative' });
             }
@@ -1620,7 +1841,7 @@
             if (data.fibrosis === 1) {
                 score += 40;
                 reasoning.push({ text: '✓✓ Fibrosi MINIMA MF-1 (chiave Pre-PMF)', points: '+40', type: 'positive' });
-            } else if (data.fibrosis === 0) {
+            } else if (data.fibrosis === 0 || data.fibrosis === null) {
                 score += 10;
                 reasoning.push({ text: 'MF-0 con clustering', points: '+10', type: 'positive' });
             } else if (data.fibrosis >= 2) {
@@ -1631,6 +1852,12 @@
             if (data.cellularity === 'normal' || data.cellularity === 'increased') {
                 score += 15;
                 reasoning.push({ text: 'Cellularità normocellulare', points: '+15', type: 'positive' });
+            }
+            
+            // FIX v2.1: Triple-negative
+            if (data.triple_neg && !data.jak2 && !data.calr && !data.mpl) {
+                score -= 10;
+                reasoning.push({ text: 'Triple-negative: richiede conferma clonalità', points: '-10', type: 'negative' });
             }
             
             return { score: Math.max(0, score), reasoning };
@@ -1783,6 +2010,7 @@
             // WHO 2022 formal criteria
             const who_pv = calculateWHOPVScore(data);
             const who_et = calculateWHOETScore(data);
+            const who_pre_pmf = calculateWHOPrePMFScore(data); // FIX v2.1: Aggiunto Pre-PMF
             const who_pmf = calculateWHOPMFScore(data);
             
             const red_flags = detectRedFlags(data);
@@ -1818,12 +2046,15 @@
                 };
             }
             
-            const report = generateReport(data, primary_diagnosis, red_flags, who_pv, who_et, who_pmf);
-            displayResults(data, primary_diagnosis, red_flags, report, who_pv, who_et, who_pmf);
+            const report = generateReport(data, primary_diagnosis, red_flags, who_pv, who_et, who_pre_pmf, who_pmf);
+            displayResults(data, primary_diagnosis, red_flags, report, who_pv, who_et, who_pre_pmf, who_pmf);
             switchTab('results');
         }
         
         function collectData() {
+            // FIX v2.1: Gestione fibrosis null
+            const fibrosisValue = document.getElementById('fibrosis').value;
+            
             return {
                 biopsy_date: document.getElementById('biopsy-date').value,
                 age: parseInt(document.getElementById('age').value) || null,
@@ -1832,7 +2063,7 @@
                 cellularity: document.getElementById('cellularity').value,
                 megakaryocyte: document.getElementById('megakaryocyte').value,
                 proliferation: document.getElementById('proliferation').value,
-                fibrosis: parseInt(document.getElementById('fibrosis').value) || 0,
+                fibrosis: fibrosisValue !== '' ? parseInt(fibrosisValue) : null, // FIX: null se non selezionato
                 me_ratio: document.getElementById('me_ratio').value,
                 lymphoid_percent: parseFloat(document.getElementById('lymphoid-percent').value) || 0,
                 lymphoid_distribution: document.getElementById('lymphoid-distribution').value,
@@ -1857,6 +2088,7 @@
                 jak2: document.getElementById('jak2').checked,
                 calr: document.getElementById('calr').checked,
                 mpl: document.getElementById('mpl').checked,
+                triple_neg: document.getElementById('triple_neg').checked, // FIX v2.1: Ora utilizzato
                 cytogenetics: document.getElementById('cytogenetics').value,
                 cytogenetics_notes: document.getElementById('cytogenetics-notes').value,
                 splenomegaly: document.getElementById('splenomegaly').checked,
@@ -1867,31 +2099,31 @@
             };
         }
         
-        function generateReport(data, diagnosis, red_flags, who_pv, who_et, who_pmf) {
+        function generateReport(data, diagnosis, red_flags, who_pv, who_et, who_pre_pmf, who_pmf) {
             let report = `REFERTO ISTOLOGICO - BIOPSIA OSTEOMIDOLLARE\n`;
             report += `${'='.repeat(70)}\n`;
             if (data.biopsy_date) report += `DATA: ${data.biopsy_date}\n`;
             report += `${'='.repeat(70)}\n\n`;
             
             report += `CELLULARITÀ:\n`;
-            report += `- Percentuale: ${data.cellularity_percent}% (${data.cellularity})\n`;
+            report += `- Percentuale: ${data.cellularity_percent || 'N/V'}% (${data.cellularity || 'N/V'})\n`;
             report += `- Rapporto M/E: ${data.me_ratio || 'non valutato'}\n\n`;
             
             report += `ISTOLOGIA:\n`;
             report += `- Megacariociti: ${data.megakaryocyte}\n`;
             report += `- Proliferazione: ${data.proliferation}\n`;
-            report += `- Fibrosi: MF-${data.fibrosis}\n`;
+            report += `- Fibrosi: ${data.fibrosis !== null ? 'MF-' + data.fibrosis : 'non valutata'}\n`;
             report += `- Blasti: ${data.blasts_percent}%\n`;
             if (data.morphology_notes) report += `- Note morfologiche: ${data.morphology_notes}\n`;
             report += `\n`;
             
             report += `IMMUNOISTOCHIMICA:\n`;
-            report += `- E-caderina: ${data.ecadherin}\n`;
-            report += `- MPO: ${data.mpo} / CD15: ${data.cd15}\n`;
-            report += `- CD68: ${data.cd68} / CD14: ${data.cd14} / CD163: ${data.cd163}\n`;
-            report += `- CD61: ${data.cd61}\n`;
-            report += `- CD3: ${data.cd3} / CD20: ${data.cd20}\n`;
-            report += `- CD138: ${data.cd138}\n`;
+            report += `- E-caderina: ${data.ecadherin || 'N/E'}\n`;
+            report += `- MPO: ${data.mpo || 'N/E'} / CD15: ${data.cd15 || 'N/E'}\n`;
+            report += `- CD68: ${data.cd68 || 'N/E'} / CD14: ${data.cd14 || 'N/E'} / CD163: ${data.cd163 || 'N/E'}\n`;
+            report += `- CD61: ${data.cd61 || 'N/E'}\n`;
+            report += `- CD3: ${data.cd3 || 'N/E'} / CD20: ${data.cd20 || 'N/E'}\n`;
+            report += `- CD138: ${data.cd138 || 'N/E'}\n`;
             if (data.kappa_lambda) report += `- K/L: ${data.kappa_lambda}\n`;
             report += `\n`;
             
@@ -1901,12 +2133,13 @@
             if (data.plt) report += `- Piastrine: ${data.plt}×10⁹/L\n`;
             if (data.wbc) report += `- Leucociti: ${data.wbc}×10⁹/L\n`;
             if (data.monocytes_absolute) report += `- Monociti periferici: ${data.monocytes_absolute}×10⁹/L\n`;
-            if (data.jak2 || data.calr || data.mpl) {
+            if (data.jak2 || data.calr || data.mpl || data.triple_neg) {
                 report += `- Molecolare: `;
                 let mol = [];
                 if (data.jak2) mol.push('JAK2+');
                 if (data.calr) mol.push('CALR+');
                 if (data.mpl) mol.push('MPL+');
+                if (data.triple_neg) mol.push('Triple-negative');
                 report += mol.join(', ') + '\n';
             }
             if (data.cytogenetics && data.cytogenetics !== '') {
@@ -1922,7 +2155,8 @@
                 report += `\nCriteri WHO 2022:\n`;
                 report += `- PV: ${who_pv.diagnosis} (${who_pv.summary})\n`;
                 report += `- ET: ${who_et.diagnosis} (${who_et.summary})\n`;
-                report += `- PMF: ${who_pmf.diagnosis} (${who_pmf.summary})\n`;
+                report += `- Pre-PMF: ${who_pre_pmf.diagnosis} (${who_pre_pmf.summary})\n`;
+                report += `- PMF overt: ${who_pmf.diagnosis} (${who_pmf.summary})\n`;
             } else {
                 report += `RED FLAG CRITICO: ${diagnosis.diagnosis}\n`;
                 report += `${diagnosis.alert.message}\n`;
@@ -1931,8 +2165,8 @@
             return report;
         }
         
-        function displayResults(data, diagnosis, red_flags, report, who_pv, who_et, who_pmf) {
-            let html = `<h3>📊 Risultati Analisi</h3>`;
+        function displayResults(data, diagnosis, red_flags, report, who_pv, who_et, who_pre_pmf, who_pmf) {
+            let html = `<h3>📊 Risultati Analisi v2.1</h3>`;
             
             // Red flags
             if (red_flags.length > 0) {
@@ -1969,21 +2203,46 @@
             html += `<p><strong>${who_et.summary}</strong></p>`;
             html += `<p style="margin-top: 10px; font-size: 0.9em;"><em>Diagnosi richiede: TUTTI i 4 criteri</em></p>`;
             who_et.criteria.forEach(c => {
-                const critClass = c.met ? 'who-criteria met' : 'who-criteria not-met';
+                const critClass = c.met === true ? 'who-criteria met' : 
+                                 c.met === false ? 'who-criteria not-met' : 'who-criteria';
                 html += `<div class="${critClass}">`;
                 html += `<strong>Criterio ${c.number}:</strong> ${c.text}`;
                 html += `</div>`;
             });
             html += `</div>`;
             
+            // Pre-PMF WHO (FIX v2.1: Aggiunto)
+            html += `<div class="pattern-box who-box">`;
+            html += `<h4>Pre-PMF - ${who_pre_pmf.diagnosis}</h4>`;
+            html += `<p><strong>${who_pre_pmf.summary}</strong></p>`;
+            html += `<p style="margin-top: 10px; font-size: 0.9em;"><em>Diagnosi richiede: tutti i maggiori + ≥1 minore</em></p>`;
+            html += `<p style="margin-top: 10px;"><strong>Criteri Maggiori:</strong></p>`;
+            who_pre_pmf.majorCriteria.forEach(c => {
+                const critClass = c.met === true ? 'who-criteria met' : 
+                                 c.met === false ? 'who-criteria not-met' : 'who-criteria';
+                html += `<div class="${critClass}">`;
+                html += `<strong>Maggiore ${c.number}:</strong> ${c.text}`;
+                html += `</div>`;
+            });
+            html += `<p style="margin-top: 15px;"><strong>Criteri Minori:</strong></p>`;
+            who_pre_pmf.minorCriteria.forEach(c => {
+                const critClass = c.met === true ? 'who-criteria met' : 
+                                 c.met === false ? 'who-criteria not-met' : 'who-criteria';
+                html += `<div class="${critClass}">`;
+                html += `<strong>Minore ${c.number}:</strong> ${c.text}`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+            
             // PMF WHO
             html += `<div class="pattern-box who-box">`;
-            html += `<h4>Mielofibrosi Primaria - ${who_pmf.diagnosis}</h4>`;
+            html += `<h4>Mielofibrosi Primaria (overt) - ${who_pmf.diagnosis}</h4>`;
             html += `<p><strong>${who_pmf.summary}</strong></p>`;
-            html += `<p style="margin-top: 10px; font-size: 0.9em;"><em>Diagnosi richiede: ≥3 maggiori + ≥1 minore</em></p>`;
+            html += `<p style="margin-top: 10px; font-size: 0.9em;"><em>Diagnosi richiede: tutti i maggiori + ≥1 minore</em></p>`;
             html += `<p style="margin-top: 10px;"><strong>Criteri Maggiori:</strong></p>`;
             who_pmf.majorCriteria.forEach(c => {
-                const critClass = c.met ? 'who-criteria met' : 'who-criteria not-met';
+                const critClass = c.met === true ? 'who-criteria met' : 
+                                 c.met === false ? 'who-criteria not-met' : 'who-criteria';
                 html += `<div class="${critClass}">`;
                 html += `<strong>Maggiore ${c.number}:</strong> ${c.text}`;
                 html += `</div>`;
