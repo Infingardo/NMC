@@ -1,165 +1,197 @@
-# ✅ NMC Diagnostic Tool v2.0 - CON BIBLIOGRAFIA
+# 🔬 NMC Diagnostic Tool v2.0 - Pattern Recognition + WHO 2022
 
-## 📦 File Completo Pronto!
+Workflow diagnostico completo per Neoplasie Mieloproliferative Croniche (MPN) con **doppio sistema di valutazione**.
 
-Il file **index.html** è completo e pronto per l'uso. Include tutto il codice originale più la bibliografia scientifica integrata.
+## ✨ Novità v2.0
 
----
+### Sistema Diagnostico Doppio Binario
 
-## 🎯 Cosa c'è nel file
+**1. Pattern Recognition (Scoring Euristico)**
+- Analisi rapida basata su pattern istologici
+- Score 0-100 per ET, PV, PMF, Pre-PMF
+- Utile per screening iniziale e orientamento diagnostico
 
-### Funzionalità Complete
-- ✅ Input dati paziente (età, sesso, emocromo)
-- ✅ Valutazione istologica completa
-- ✅ Pannello IHC completo (E-cad, CD68, CD14, CD163, CD61, CD3, CD20, CD138)
-- ✅ Dati clinici e molecolari (JAK2, CALR, MPL)
-- ✅ Criteri WHO 2022 formali (PV, ET, PMF)
-- ✅ Pattern Recognition scoring
-- ✅ Red Flags detection (AML, LMMC, Linfoma, Mieloma, CML)
-- ✅ Referto strutturato copy-paste
+**2. Criteri WHO 2022 Formali** ⭐ NUOVO
+- Applicazione rigorosa dei criteri ufficiali WHO 2022
+- Sistema maggiori/minori per PV
+- 4 criteri obbligatori per ET
+- Criteri maggiori + minori per PMF
+- **Output: CONFERMATO / NON CONFERMATO / ESCLUSO**
 
-### 📖 Bibliografia (NUOVA!)
-**10 riferimenti scientifici** organizzati in 4 categorie:
-
-1. **WHO 2022** (2 riferimenti - box verde)
-   - WHO Classification 2022 ufficiale
-   - Khoury et al., Leukemia 2022
-
-2. **Criteri Diagnostici** (3 riferimenti - box blu)
-   - Barbui et al., Blood Cancer J 2018
-   - Thiele et al., Haematologica 2005 (fibrosi + cellularità)
-   - Arber et al., Blood 2022 (ICC 2022)
-
-3. **IHC e Pattern** (3 riferimenti - box giallo)
-   - Falini et al., Blood 2006 (NPM1-IHC)
-   - Orazi et al., Mod Pathol 2006 (CD68/CD14/CD163)
-   - Della Porta et al., Haematologica 2008 (E-caderina)
-
-4. **Diagnosi Differenziale** (2 riferimenti - box rosso)
-   - Tefferi & Vardiman, Leukemia 2008
-   - WHO 2017 (confronto)
-
-Tutti i link sono cliccabili e aprono in nuova tab:
-- 🔗 DOI diretti (8 link)
-- 🔗 IARC Publications (2 link WHO)
-- 🔗 PubMed (1 link)
-
----
-
-## 🚀 Come Usare il File
-
-### 1. Download
-- Scarica il file `index.html` dalla cartella outputs
-- Salva dove preferisci (es. Desktop, Documenti)
-
-### 2. Apertura
-**Opzione A - Locale (consigliata):**
-- Doppio click sul file `index.html`
-- Si apre nel browser predefinito
-- Funziona offline
-
-**Opzione B - GitHub Pages:**
-- Carica su repository GitHub
-- Rinomina in `index.html` (se necessario)
-- Abilita GitHub Pages
-- Accesso via URL pubblico
-
-### 3. Utilizzo
-1. Compila i campi obbligatori (cellularità, megacariociti, proliferazione, fibrosi)
-2. Aggiungi IHC disponibile
-3. Inserisci dati clinici (età, sesso, emocromo, mutazioni)
-4. Click su "🔍 Analizza Caso"
-5. Vai alla tab "📊 Risultati"
-6. Copia referto con "📋 Copia Referto"
-
-### 4. Consultazione Bibliografia
-1. Vai alla tab "📚 Riferimenti"
-2. Scrolla fino alla sezione "📖 Bibliografia"
-3. Click sui link 🔗 per aprire i paper
-4. Box colorati per categoria
-
----
-
-## 📊 Statistiche File
+### Confronto Output
 
 ```
-Dimensione: 90 KB
-Righe codice: 2059
-Sezioni: 3 tab (Input, Risultati, Riferimenti)
-Riferimenti bibliografici: 10
-Link cliccabili: 11 (8 DOI + 2 IARC + 1 PubMed)
+ESEMPIO OUTPUT:
+
+📊 Criteri WHO 2022 Formali
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Policitemia Vera - PV_CONFERMATO
+   Maggiori: 3/3, Minori: 0/1
+   ✓ Maggiore 1: Hb 17.2 g/dL (>16.5)
+   ✓ Maggiore 2: Panmielosi + megacariociti pleomorfi
+   ✓ Maggiore 3: JAK2 V617F positivo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔬 Pattern Recognition
+   Score: 85/100 (Confidenza: 85%)
+   Supporta diagnosi PV
 ```
 
----
+## 📋 Caratteristiche Complete
 
-## 🔧 Compatibilità Browser
+### Input Dati
+- **Dati paziente**: età, sesso (per soglie PV age/sex-adjusted)
+- **Istologia completa**:
+  - Cellularità WHO 2022 (range age-adjusted automatici)
+  - Morfologia megacariociti (4 pattern: ET, PV, PMF, normale)
+  - Proliferazione midollare (5 pattern)
+  - Fibrosi MF-0/1/2/3
+  - Rapporto M/E
+  - Componente linfoide (% e distribuzione)
 
-✅ **Testato e compatibile con:**
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+- **Pannello IHC completo**:
+  - **Linea eritroide**: E-caderina (CRITICO per PV)
+  - **Linea granulocitaria**: MPO, CD15
+  - **Linea monocitica**: CD68 (KP1/PG-M1), CD14, CD163
+  - **Linea megacariocitica**: CD61
+  - **Linea linfoide**: CD3, CD20
+  - **Plasmacellule**: CD138, K/L
 
-✅ **Responsive:** funziona su desktop, tablet, mobile
+- **Dati clinico-laboratoristici**:
+  - Emocromo (Hb, Hct, PLT, WBC) → per criteri WHO
+  - Blasti% → AML exclusion
+  - Monociti assoluti → LMMC diagnosis
+  - Mutazioni JAK2/CALR/MPL
+  - Citogenetica (con CML t(9;22) detection)
+  - Segni clinici: splenomegalia, sintomi, anemia, LDH
 
----
+### Output Diagnostico
 
-## 📝 Note Importanti
+#### 1. Red Flags (Priorità Massima)
+- 🚨 **AML**: blasti >20%, pattern MPO/CD15, CD68/CD14 monoblastico
+- 🚨 **LMMC**: CD68++/CD14++/CD163++ + monociti >1×10⁹/L
+- 🚨 **Linfoma**: componente linfoide >20%, pattern a tappeto
+- 🚨 **Mieloma**: CD138 >10% ± K/L alterato
+- 🚨 **CML**: t(9;22) BCR/ABL
 
-### Accesso Paper
-⚠️ La maggior parte dei paper è dietro paywall:
-- Abstract sempre gratuiti su PubMed
-- Full-text richiede subscription istituzionale
-- Link DOI reindirizzano a publisher ufficiale
+#### 2. Criteri WHO 2022 (NUOVO)
 
-### Privacy e Dati
-- ✅ Nessun server, privacy totale
-- ✅ Dati salvati solo nel browser locale (localStorage)
-- ✅ Reset manuale disponibile
+**Policitemia Vera**
+- Diagnosi: ≥2 maggiori O 1 maggiore + 1 minore
+- Valutazione automatica soglie Hb/Hct sex-adjusted
+- Check panmielosi + megacariociti pleomorfi
+- Integrazione JAK2
 
-### Disclaimer
-- Il tool è un supporto diagnostico, non sostituisce la valutazione clinica
-- I criteri WHO richiedono correlazione clinico-patologica completa
-- Alcuni criteri WHO non sono valutabili (EPO, leucoeritroblastosi)
+**Trombocitemia Essenziale**
+- Diagnosi: TUTTI i 4 criteri
+- PLT ≥450, megacariociti iperlobulati
+- Esclusione PV/PMF/CML/MDS automatica
+- Driver mutation required
 
----
+**Mielofibrosi Primaria**
+- Diagnosi: ≥3 maggiori + ≥1 minore
+- Clustering + fibrosi MF-2/3
+- Score minori: anemia, leucocitosi, splenomegalia, LDH
+- Distinzione Pre-PMF automatica
 
-## 🆕 Versioni
+#### 3. Pattern Recognition
+- Score 0-100 per ET/PV/PMF/Pre-PMF
+- Ranking automatico con diagnosi differenziale
+- Reasoning esplicito (punti positivi/negativi)
 
-**v2.0 - con Bibliografia** (corrente)
-- ✨ 10 riferimenti scientifici cliccabili
-- ✨ 4 categorie organizzate (WHO, Criteri, IHC, DDX)
-- ✨ Note sui paywall e accesso
-- ✅ Tutti i link verificati e funzionanti
+#### 4. Referto Strutturato
+- Sezioni: cellularità, istologia, IHC, dati clinici
+- Diagnosi WHO + Pattern recognition integrati
+- Formato copy-paste per refertazione
 
-**v2.0 - originale**
-- Criteri WHO 2022 formali
-- Pattern recognition scoring
+## 🎯 Uso Clinico
+
+### Workflow Consigliato
+
+1. **Compila dati obbligatori**:
+   - Cellularità, megacariociti, proliferazione, fibrosi
+   - Almeno emocromo base (Hb/Hct/PLT/WBC)
+
+2. **Aggiungi IHC disponibile**:
+   - Minimo: E-caderina, CD61, CD68
+   - Completo: pannello full
+
+3. **Analizza caso** → Output doppio:
+   - ✅ **WHO 2022**: diagnosi formale (CONFERMATO/ESCLUSO)
+   - 🔬 **Pattern Recognition**: supporto diagnostico
+
+4. **Interpreta risultati**:
+   - Se WHO confermato → diagnosi certa
+   - Se WHO non confermato ma pattern high score → rivaluta dati/IHC
+   - Se red flag critico → priorità assoluta
+
+### Esempio Caso Completo
+
+```
+Input:
+- M, 62 anni
+- Hb 17.8, Hct 52%, PLT 580, WBC 14
+- Panmielosi, megacariociti pleomorfi
+- E-caderina aumentata, M/E 1.5:1
+- JAK2 V617F+
+- Fibrosi MF-0
+
+Output WHO 2022:
+✅ PV_CONFERMATO (3/3 maggiori)
+
+Pattern Recognition:
+Score PV: 90/100
+
+Diagnosi: POLICITEMIA VERA WHO 2022
+```
+
+## 🚨 Limitazioni
+
+⚠️ **Il tool NON sostituisce la diagnosi clinica**
+- È un supporto per pattern recognition e applicazione criteri
+- La diagnosi finale richiede correlazione clinico-patologica
+- Alcuni criteri WHO (EPO, leucoeritroblastosi) non valutabili
+- Red flags richiedono conferma con indagini aggiuntive
+
+## 📚 Riferimenti
+
+- WHO Classification of Haematolymphoid Tumours 2022 (5th edition)
+- Criteri diagnostici aggiornati per PV, ET, PMF
+- Range cellularità age-adjusted (0-120 anni)
+- Pattern IHC validati su pannello reale di laboratorio
+
+## 🔄 Versioni
+
+**v2.0** (corrente)
+- ✨ Criteri WHO 2022 formali integrati
+- Sistema diagnostico doppio binario
+- Output WHO CONFERMATO/ESCLUSO
+- LDH e anemia per PMF scoring
+
+**v1.0** 
+- Pattern recognition istologico
 - Red flags detection
 - Pannello IHC completo
+- Cellularità WHO 2022
 
----
+## 💾 Salvataggio Dati
 
-## 📧 Supporto
+- **localStorage browser**: i dati vengono salvati localmente
+- Nessun server, privacy totale
+- Reset manuale disponibile
 
-Per problemi, suggerimenti o nuovi riferimenti:
-- Issues GitHub (se pubblico)
-- Email diretta al maintainer
-- Feedback thumbs up/down nel tool
+## 🔧 Deploy
 
----
-
-## 🎓 Materiale Aggiuntivo
-
-Nella cartella trovi anche:
-- **README_Bibliografia.md**: istruzioni dettagliate bibliografia
-- **NOTE_TECNICHE_Bibliografia.md**: approfondimenti tecnici (KP1 vs PG-M1, E-caderina, CD163, NGS)
-- **bibliografia_to_insert.html**: codice HTML standalone bibliografia (per riferimento)
+```bash
+# Copia index_v2.html in root repo
+# Rinomina in index.html
+# Push su GitHub
+# Abilita GitHub Pages
+```
 
 ---
 
 **Developed for SC Anatomia Patologica**  
 ASST Fatebenefratelli-Sacco, Milano
 
-**Tool diagnostico per uso professionale in anatomia patologica**  
-Versione 2.0 - Novembre 2025
+Tool diagnostico per uso professionale in anatomia patologica.
