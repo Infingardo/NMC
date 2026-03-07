@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMC Diagnostic Tool v3.0 — Collegio Ematologico</title>
+    <title>NMC Diagnostic Tool v3.14 — Collegio Ematologico</title>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -33,7 +33,6 @@
             font-size: 14px;
         }
 
-        /* ── HEADER ── */
         .header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -56,6 +55,7 @@
             margin-top: 2px;
             font-family: 'IBM Plex Mono', monospace;
         }
+        .header-right { display: flex; align-items: center; gap: 10px; }
         .version-chip {
             background: var(--surface2);
             border: 1px solid var(--border);
@@ -67,14 +67,35 @@
             letter-spacing: 0.1em;
         }
 
-        /* ── LAYOUT ── */
+        /* MODE TOGGLE */
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 8px;
+        }
+        .mode-toggle label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.68em;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+        .mode-toggle input[type="checkbox"] {
+            accent-color: var(--discord);
+            width: 14px; height: 14px;
+        }
+        #strict-label { transition: color 0.2s; }
+
         .app-body {
             display: grid;
             grid-template-columns: 380px 1fr;
             min-height: calc(100vh - 65px);
         }
 
-        /* ── LEFT PANEL: INPUT ── */
         .input-panel {
             background: var(--surface);
             border-right: 1px solid var(--border);
@@ -98,9 +119,9 @@
             padding: 10px 20px 10px 16px;
             background: #e8edf5;
             border-left: 4px solid var(--who-color);
-        }
-        .input-section-title::after {
-            display: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         .field { margin-bottom: 12px; }
@@ -129,7 +150,6 @@
             border-color: var(--who-color);
         }
         select option { background: #ffffff; color: #1e293b; }
-
         textarea { resize: vertical; min-height: 60px; }
 
         .field-hint {
@@ -182,7 +202,7 @@
             transition: background 0.2s, transform 0.1s;
             text-transform: uppercase;
         }
-        .analyze-btn:hover { background: #2563eb; }
+        .analyze-btn:hover { background: #1d4ed8; }
         .analyze-btn:active { transform: scale(0.99); }
 
         .reset-btn {
@@ -213,7 +233,7 @@
             border-radius: 0 3px 3px 0;
         }
 
-        /* ── RIGHT PANEL: RESULTS ── */
+        /* RESULTS */
         .results-panel {
             overflow-y: auto;
             max-height: calc(100vh - 65px);
@@ -234,7 +254,6 @@
         .empty-state .icon { font-size: 3em; opacity: 0.3; }
         .empty-state p { font-family: 'IBM Plex Mono', monospace; font-size: 0.8em; }
 
-        /* ── BOARD HEADER ── */
         .board-title {
             font-family: 'IBM Plex Mono', monospace;
             font-size: 0.7em;
@@ -244,7 +263,72 @@
             margin-bottom: 16px;
         }
 
-        /* ── TRI-MODAL GRID ── */
+        /* CONFIDENCE BADGE */
+        .confidence-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            margin-bottom: 14px;
+        }
+        .confidence-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.68em;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .confidence-level {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.82em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+        }
+        .confidence-notes {
+            font-size: 0.72em;
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        /* HIERARCHY OUTPUT */
+        .dx-hierarchy {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+        }
+        .dx-hierarchy-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.65em;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .dx-primary {
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .dx-primary span { color: var(--who-color); }
+        .dx-differential {
+            font-size: 0.78em;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+        .dx-missing {
+            font-size: 0.75em;
+            color: var(--warning);
+            font-style: italic;
+        }
+
+        /* TRI-MODAL GRID */
         .trimodal-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -289,7 +373,6 @@
         .morfo-panel .modal-title { color: var(--morfo-color); }
         .mol-panel .modal-title  { color: var(--mol-color); }
 
-        /* ── DIAGNOSIS CHIPS ── */
         .dx-row {
             display: flex;
             flex-direction: column;
@@ -306,17 +389,9 @@
             background: var(--surface2);
             border: 1px solid var(--border);
         }
-        .dx-item.confirmed {
-            background: #f0fdf4;
-            border-color: #86efac;
-        }
-        .dx-item.probable {
-            background: #fffbeb;
-            border-color: #fcd34d;
-        }
-        .dx-item.excluded {
-            opacity: 0.4;
-        }
+        .dx-item.confirmed { background: #f0fdf4; border-color: #86efac; }
+        .dx-item.probable  { background: #fffbeb; border-color: #fcd34d; }
+        .dx-item.excluded  { opacity: 0.4; }
 
         .dx-label {
             font-family: 'IBM Plex Mono', monospace;
@@ -335,13 +410,7 @@
         .dx-item.probable .dx-status  { background: #fef9c3; color: var(--warning); }
         .dx-item.excluded .dx-status  { background: var(--surface2); color: var(--text-muted); }
 
-        /* ── SCORE BAR ── */
-        .score-bar-row {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .score-item { }
+        .score-bar-row { display: flex; flex-direction: column; gap: 8px; }
         .score-item-label {
             display: flex;
             justify-content: space-between;
@@ -362,7 +431,6 @@
             transition: width 0.6s ease;
         }
 
-        /* ── MOL PANEL ── */
         .mol-item {
             display: flex;
             align-items: center;
@@ -384,7 +452,6 @@
         .mol-neg { background: #f5f7fa; color: var(--text-muted); }
         .mol-partial { background: #fef3c7; color: var(--warning); }
 
-        /* ── DISCORDANCE BANNER ── */
         .discord-banner {
             background: #faf5ff;
             border: 1px solid #c4b5fd;
@@ -423,7 +490,6 @@
             display: inline-block;
         }
 
-        /* ── RED FLAGS ── */
         .redflag-area { margin-bottom: 16px; }
         .redflag-item {
             background: #fef2f2;
@@ -432,6 +498,10 @@
             padding: 12px 16px;
             margin-bottom: 8px;
         }
+        .redflag-item.severity-2 {
+            background: #fffbeb;
+            border-color: #fcd34d;
+        }
         .redflag-title {
             font-family: 'IBM Plex Mono', monospace;
             font-size: 0.78em;
@@ -439,6 +509,7 @@
             color: var(--danger);
             margin-bottom: 4px;
         }
+        .redflag-item.severity-2 .redflag-title { color: var(--warning); }
         .redflag-msg { font-size: 0.8em; color: var(--text-dim); }
         .redflag-action {
             font-size: 0.75em;
@@ -446,8 +517,8 @@
             margin-top: 6px;
             font-style: italic;
         }
+        .redflag-item.severity-2 .redflag-action { color: var(--warning); }
 
-        /* ── CRITERIA DETAIL ── */
         .criteria-detail {
             margin-top: 14px;
             padding-top: 14px;
@@ -477,7 +548,6 @@
         .crit-icon.partial { color: var(--warning); }
         .crit-icon.unknown { color: var(--text-muted); }
 
-        /* ── REPORT ── */
         .report-section {
             margin-top: 16px;
             background: var(--surface);
@@ -522,7 +592,6 @@
             overflow-y: auto;
         }
 
-        /* ── MPN-U ── */
         .mpnu-banner {
             background: #faf5ff;
             border: 1px solid #ddd6fe;
@@ -553,7 +622,6 @@
             font-size: 0.85em;
         }
 
-        /* ── ICC WARNING ── */
         .icc-chip {
             display: inline-flex;
             align-items: center;
@@ -568,7 +636,6 @@
             width: 100%;
         }
 
-        /* ── CELLULARITY HINT ── */
         #cellularity-hint {
             font-size: 0.72em;
             color: var(--text-muted);
@@ -576,7 +643,15 @@
             font-family: 'IBM Plex Mono', monospace;
         }
 
-        /* ── SCROLLBAR ── */
+        /* Other clonal marker area */
+        .clonal-expand {
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 4px;
+        }
+
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
@@ -596,12 +671,18 @@
         <h1>🔬 NMC <span>Diagnostic Tool</span></h1>
         <p>Collegio Ematologico Parallelo — WHO 2022 · Morfologia · Clinico-Molecolare</p>
     </div>
-    <span class="version-chip">v3.0</span>
+    <div class="header-right">
+        <div class="mode-toggle">
+            <input type="checkbox" id="strict-mode" onchange="updateStrictLabel()">
+            <label for="strict-mode" id="strict-label">EXPERT BOARD</label>
+        </div>
+        <span class="version-chip">v3.14</span>
+    </div>
 </div>
 
 <div class="app-body">
 
-    <!-- ══════════════ LEFT: INPUT ══════════════ -->
+    <!-- ══ LEFT: INPUT ══ -->
     <div class="input-panel">
 
         <div class="input-section">
@@ -633,15 +714,15 @@
         <div class="input-section">
             <div class="input-section-title" style="border-color:#059669;">Istologia</div>
 
-            <!-- 1. CILINDRO -->
             <div class="field">
                 <label>Qualità campione</label>
                 <select id="biopsy-quality">
                     <option value="">--</option>
                     <option value="adequate">Adeguato (≥15 mm, ≥5 spazi)</option>
-                    <option value="suboptimal">Subottimale (10-15 mm o <5 spazi)</option>
-                    <option value="inadequate">Inadeguato (<10 mm)</option>
+                    <option value="suboptimal">Subottimale (10-15 mm o &lt;5 spazi)</option>
+                    <option value="inadequate">Inadeguato (&lt;10 mm) ⚠️</option>
                 </select>
+                <div class="field-hint alert" id="quality-warn" style="display:none;">⚠ Campione inadeguato — nessuna classificazione definitiva possibile</div>
             </div>
             <div class="grid2">
                 <div class="field">
@@ -654,7 +735,6 @@
                 </div>
             </div>
 
-            <!-- 2. CELLULARITÀ GLOBALE -->
             <div class="grid2">
                 <div class="field">
                     <label>Cellularità (%)</label>
@@ -672,57 +752,52 @@
                 </div>
             </div>
 
-            <!-- 3. RAPPORTO M/E -->
             <div class="field">
                 <label>Rapporto M/E</label>
                 <select id="me_ratio">
                     <option value="">-- N/V --</option>
                     <option value="normal">Normale (2-4:1)</option>
-                    <option value="increased">Aumentato (>4:1)</option>
-                    <option value="decreased">Ridotto (&lt;2:1)</option>
+                    <option value="increased">Aumentato (&gt;4:1) — eritroide relativa ridotta</option>
+                    <option value="decreased">Ridotto (&lt;2:1) — eritroide relativa aumentata</option>
                     <option value="inverted">Invertito (&lt;1:1)</option>
                 </select>
             </div>
 
-            <!-- 5. LINEA MEGACARIOCITICA -->
             <div class="field">
                 <label>Megacariociti — morfologia</label>
                 <select id="megakaryocyte">
                     <option value="">--</option>
                     <option value="normal">Normali</option>
                     <option value="hyperlobulated">Iperlobulati maturi (quadro ET)</option>
-                    <option value="clustered">Clustering + atipia (quadro PMF)</option>
+                    <option value="clustered">Clustering + atipia (quadro PMF/Pre-PMF)</option>
                     <option value="pleomorphic">Pleomorfi varie taglie (quadro PV)</option>
                 </select>
             </div>
 
-            <!-- 6. LINEA GRANULOCITARIA (pattern proliferativo) -->
             <div class="field">
                 <label>Proliferazione midollare (pattern dominante)</label>
                 <select id="proliferation">
                     <option value="">--</option>
                     <option value="minimal">Minima/Normale</option>
                     <option value="megakaryocytic">Megacariocitica</option>
-                    <option value="granulocytic">Granulocitaria</option>
+                    <option value="granulocytic">Granulocitaria ± megacariocitica</option>
                     <option value="panmyelosis">Panmielosi (E+G+M)</option>
                     <option value="erythroid">Eritroide</option>
                 </select>
             </div>
 
-            <!-- 7. LINEA ERITROIDE (E-caderina qui, non nell'IHC) -->
             <div class="field">
                 <label>E-caderina — linea eritroide</label>
                 <select id="ecadherin">
                     <option value="">-- N/E --</option>
                     <option value="increased">Aumentata (eritropoiesi accelerata)</option>
-                    <option value="focal">Focale (normale)</option>
-                    <option value="negative">Negativa/assente</option>
-                    <option value="absent">Ridotta (eritropoiesi inefficace)</option>
+                    <option value="normal">Normale/focale</option>
+                    <option value="reduced">Ridotta (eritropoiesi inefficace)</option>
+                    <option value="absent">Assente/negativa</option>
                 </select>
                 <div class="field-hint">Supportivo per PV se aumentata — non criterio WHO</div>
             </div>
 
-            <!-- 8. LINEA LINFOIDE -->
             <div class="grid2">
                 <div class="field">
                     <label>Linfoide (%)</label>
@@ -741,20 +816,19 @@
                 </div>
             </div>
 
-            <!-- 9. STRISCIO — lo vede l'ematologo -->
             <div class="field">
                 <div class="check-field">
                     <input type="checkbox" id="leukoerythroblastosis">
                     <label for="leukoerythroblastosis">Leucoeritroblastosi (striscio periferico)</label>
                 </div>
-                <div class="field-hint">Eritroblasti + precursori immaturi in circolo + dacriociti — criterio minore PMF WHO 2022<br>⚠ Dato dello striscio periferico: richiedere referto ematologo se non disponibile</div>
+                <div class="field-hint">Criterio minore PMF WHO 2022 — dato del patologo/ematologo su striscio</div>
             </div>
 
-            <!-- 10. NOTE LIBERE -->
             <div class="field">
                 <label>Note morfologiche</label>
                 <textarea id="morphology-notes" placeholder="dacriociti, displasia, anomalie..."></textarea>
             </div>
+
             <div class="field">
                 <label>Displasia morfologica</label>
                 <select id="dysplasia">
@@ -766,7 +840,6 @@
                 <div class="field-hint alert">Displasia multilineare significativa → escludere MDS prima di PMF</div>
             </div>
 
-            <!-- 11. FIBROSI — criterio maggiore WHO 2022, grading su Gomori/Wilder -->
             <div class="field">
                 <label>Fibrosi reticolare (MF-grading) — Gomori/Wilder</label>
                 <select id="fibrosis">
@@ -776,7 +849,7 @@
                     <option value="2">MF-2 — moderata (rete densa, intersect.)</option>
                     <option value="3">MF-3 — marcata + fibrosi collagene</option>
                 </select>
-                <div class="field-hint alert">⚠ Criterio maggiore WHO 2022 — Pre-PMF: ≤MF-1 · PMF overt: ≥MF-2<br>EE orienta (stroma, dacriociti, sinusoidi), Gomori decide</div>
+                <div class="field-hint alert">⚠ Criterio maggiore WHO 2022 — Pre-PMF: ≤MF-1 · PMF overt: ≥MF-2<br>EE orienta, Gomori decide. Senza grading: nessuna classificazione PMF/Pre-PMF definitiva</div>
             </div>
         </div>
 
@@ -873,9 +946,9 @@
                     <label>CD138</label>
                     <select id="cd138">
                         <option value="">-- N/E --</option>
-                        <option value="normal">Normale (<5%)</option>
+                        <option value="normal">Normale (&lt;5%)</option>
                         <option value="increased">5-10%</option>
-                        <option value="high">>10% ⚠️</option>
+                        <option value="high">&gt;10% ⚠️</option>
                         <option value="clusters">Aggregati</option>
                     </select>
                 </div>
@@ -949,7 +1022,7 @@
                 <div class="check-field"><input type="checkbox" id="symptoms"><label for="symptoms">Sintomi costituzionali</label></div>
                 <div class="check-field"><input type="checkbox" id="anemia"><label for="anemia">Anemia (clinica)</label></div>
             </div>
-            </div><!-- /lab-body -->
+            </div>
         </div>
 
         <div class="input-section">
@@ -981,9 +1054,23 @@
                     </select>
                 </div>
                 <div id="triple-neg-banner" style="display:none; grid-column:1/-1; background:#fef9c3; border:1px solid #fcd34d; border-radius:4px; padding:6px 10px; font-size:0.78em; color:#92400e; font-family:'IBM Plex Mono',monospace;">
-                    ⚠ Triplo negativo — richiede clonalità alternativa (ASXL1, EZH2, TET2, IDH1/2, SRSF2, SF3B1)
+                    ⚠ Triplo negativo — richiede clonalità alternativa documentata
                 </div>
             </div>
+
+            <!-- PATCH 5: Other clonal marker -->
+            <div class="field" style="margin-top:10px;" id="other-clonal-area">
+                <div class="check-field">
+                    <input type="checkbox" id="other-clonal-marker" onchange="toggleOtherClonal()">
+                    <label for="other-clonal-marker">Altro marcatore clonale documentato (NGS esteso)</label>
+                </div>
+                <div id="other-clonal-expand" style="display:none;" class="clonal-expand">
+                    <label style="font-size:0.78em;color:var(--text-muted);display:block;margin-bottom:4px;">Specificare (es. ASXL1, EZH2, TET2, IDH1/2, SRSF2, SF3B1)</label>
+                    <input type="text" id="other-clonal-marker-text" placeholder="es. ASXL1 mut, VAF 35%">
+                </div>
+                <div class="field-hint">Rilevante per triplo-negativi — clonalità alternativa richiesta da WHO/ICC per classificazione</div>
+            </div>
+
             <div class="field" style="margin-top:10px;">
                 <label>Citogenetica</label>
                 <select id="cytogenetics">
@@ -993,7 +1080,7 @@
                     <option value="trisomy8">Trisomia 8</option>
                     <option value="del20q">del(20q)</option>
                     <option value="t9_22">t(9;22) BCR/ABL ⚠️</option>
-                    <option value="complex">Complesso (>3 anomalie)</option>
+                    <option value="complex">Complesso (&gt;3 anomalie)</option>
                     <option value="other">Altra</option>
                 </select>
             </div>
@@ -1009,7 +1096,7 @@
         </div>
     </div>
 
-    <!-- ══════════════ RIGHT: RESULTS ══════════════ -->
+    <!-- ══ RIGHT: RESULTS ══ -->
     <div class="results-panel" id="results-panel">
         <div class="empty-state" id="empty-state">
             <div class="icon">⬡</div>
@@ -1030,7 +1117,7 @@ function getCellularityRange(age) {
     if (age <= 40) return { min:40, max:70, mean:55 };
     if (age <= 60) return { min:35, max:65, mean:50 };
     if (age <= 70) return { min:30, max:60, mean:45 };
-    return { min:30, max:60, mean:45 };
+    return { min:25, max:50, mean:35 };
 }
 
 function getAnemiaThreshold(sex, age) {
@@ -1040,13 +1127,13 @@ function getAnemiaThreshold(sex, age) {
 }
 
 function updateCellularityHint() {
-    const age = parseInt(document.getElementById('age').value);
-    const pct = parseFloat(document.getElementById('cellularity-percent').value);
+    const age = numOrNull('age');
+    const pct = numOrNull('cellularity-percent');
     const hint = document.getElementById('cellularity-hint');
     const sel = document.getElementById('cellularity');
-    if (!age || age <= 0) { hint.textContent = ''; return; }
+    if (age === null || age < 0) { hint.textContent = ''; return; }
     const r = getCellularityRange(age);
-    if (pct > 0) {
+    if (pct !== null) {
         let label, color, val;
         if (pct >= r.min && pct <= r.max)   { label='NORMALE'; color='var(--success)'; val='normal'; }
         else if (pct > r.max)               { label='⬆ AUMENTATA'; color='var(--danger)'; val='increased'; }
@@ -1058,34 +1145,111 @@ function updateCellularityHint() {
     }
 }
 
+function updateStrictLabel() {
+    const strict = document.getElementById('strict-mode').checked;
+    const lbl = document.getElementById('strict-label');
+    lbl.textContent = strict ? 'STRICT WHO' : 'EXPERT BOARD';
+    lbl.style.color = strict ? 'var(--discord)' : 'var(--text-muted)';
+}
+
+function toggleOtherClonal() {
+    const checked = document.getElementById('other-clonal-marker').checked;
+    document.getElementById('other-clonal-expand').style.display = checked ? 'block' : 'none';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('age').addEventListener('input', updateCellularityHint);
     document.getElementById('cellularity-percent').addEventListener('input', updateCellularityHint);
+    document.getElementById('biopsy-quality').addEventListener('change', function() {
+        document.getElementById('quality-warn').style.display =
+            this.value === 'inadequate' ? 'block' : 'none';
+        checkBiopsyIncongruence();
+    });
+    document.getElementById('biopsy-length').addEventListener('input', autoBiopsyQuality);
+    document.getElementById('biopsy-spaces').addEventListener('input', autoBiopsyQuality);
 });
+
+function autoBiopsyQuality() {
+    const len    = numOrNull('biopsy-length');
+    const spaces = numOrNull('biopsy-spaces');
+    const sel    = document.getElementById('biopsy-quality');
+    if (len === null && spaces === null) return;
+    // Fix 4: soglie coerenti con la legenda UI:
+    //   adeguato    = ≥15 mm E ≥5 spazi
+    //   subottimale = 10–15 mm O <5 spazi (ma ≥10mm)
+    //   inadeguato  = <10 mm  (spazi da soli non determinano inadeguato)
+    let derived;
+    if (len !== null && len < 10) derived = 'inadequate';
+    else if ((len !== null && len < 15) || (spaces !== null && spaces < 5)) derived = 'suboptimal';
+    else if (len !== null && len >= 15 && spaces !== null && spaces >= 5) derived = 'adequate';
+    else derived = 'suboptimal'; // Fix 5: spazi non documentati → suboptimale per prudenza
+    if (sel.value !== derived) {
+        sel.value = derived;
+        document.getElementById('quality-warn').style.display = derived === 'inadequate' ? 'block' : 'none';
+        checkBiopsyIncongruence();
+    }
+}
+
+function checkBiopsyIncongruence() {
+    const len    = numOrNull('biopsy-length');
+    const spaces = numOrNull('biopsy-spaces');
+    const qual   = document.getElementById('biopsy-quality').value;
+    let warn = '';
+    if (qual === 'adequate' && ((len !== null && len < 15) || (spaces !== null && spaces < 5)))
+        warn = `⚠ Incongruenza: qualità "adeguato" ma lunghezza ${len !== null ? len : '?'}mm / spazi ${spaces !== null ? spaces : '?'} — verificare la selezione`;
+    if (qual === 'inadequate' && len !== null && len >= 15 && spaces !== null && spaces >= 5)
+        warn = `⚠ Incongruenza: qualità "inadeguato" ma misure nella norma — verificare`;
+    document.getElementById('quality-warn').textContent = warn ||
+        (qual === 'inadequate' ? '⚠ Campione inadeguato — nessuna classificazione definitiva possibile' : '');
+    document.getElementById('quality-warn').style.display = (warn || qual === 'inadequate') ? 'block' : 'none';
+}
 
 // ============================================================================
 // DATA COLLECTION
 // ============================================================================
+// ============================================================================
+// FIX 1 — XSS: escaping HTML sistematico per tutte le stringhe utente
+// Usare su qualsiasi campo libero prima di interpolarlo in innerHTML
+// ============================================================================
+function escHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================================================
+// FIX 3 v3.14 — numOrNull: '' → null, qualsiasi numero incluso 0 → Number
+// Sostituisce parseFloat()/parseInt() || null ovunque in collectData
+// ============================================================================
+function numOrNull(id) {
+    const raw = document.getElementById(id).value;
+    return raw === '' || raw === null || raw === undefined ? null : Number(raw);
+}
+
 function collectData() {
     const fibVal   = document.getElementById('fibrosis').value;
     const blastVal = document.getElementById('blasts-percent').value;
     return {
         biopsy_date:          document.getElementById('biopsy-date').value,
         biopsy_quality:       document.getElementById('biopsy-quality').value,
-        biopsy_length:        parseFloat(document.getElementById('biopsy-length').value) || null,
-        biopsy_spaces:        parseFloat(document.getElementById('biopsy-spaces').value) || null,
-        age:                  parseInt(document.getElementById('age').value) || null,
+        biopsy_length:        numOrNull('biopsy-length'),
+        biopsy_spaces:        numOrNull('biopsy-spaces'),
+        age:                  numOrNull('age'),
         sex:                  document.getElementById('sex').value,
-        cellularity_percent:  parseFloat(document.getElementById('cellularity-percent').value) || null,
+        cellularity_percent:  numOrNull('cellularity-percent'),
         cellularity:          document.getElementById('cellularity').value,
         megakaryocyte:        document.getElementById('megakaryocyte').value,
         proliferation:        document.getElementById('proliferation').value,
-        fibrosis:             fibVal !== '' ? parseInt(fibVal) : null,
+        fibrosis:             fibVal !== '' ? Number(fibVal) : null,
         me_ratio:             document.getElementById('me_ratio').value,
-        lymphoid_percent:     parseFloat(document.getElementById('lymphoid-percent').value) || 0,
+        lymphoid_percent:     numOrNull('lymphoid-percent'),
         lymphoid_distribution:document.getElementById('lymphoid-distribution').value,
-        blasts_percent:       blastVal !== '' ? parseFloat(blastVal) : null,
-        monocytes_absolute:   parseFloat(document.getElementById('monocytes-absolute').value) || null,
+        blasts_percent:       blastVal !== '' ? Number(blastVal) : null,
+        monocytes_absolute:   numOrNull('monocytes-absolute'),
         morphology_notes:     document.getElementById('morphology-notes').value,
         dysplasia:            document.getElementById('dysplasia').value,
         leukoerythroblastosis:document.getElementById('leukoerythroblastosis').checked,
@@ -1100,15 +1264,29 @@ function collectData() {
         cd20:                 document.getElementById('cd20').value,
         cd138:                document.getElementById('cd138').value,
         kappa_lambda:         document.getElementById('kappa_lambda').value,
-        hb:                   parseFloat(document.getElementById('hb').value) || null,
-        hct:                  parseFloat(document.getElementById('hct').value) || null,
-        plt:                  parseFloat(document.getElementById('plt').value) || null,
-        wbc:                  parseFloat(document.getElementById('wbc').value) || null,
+        hb:                   numOrNull('hb'),
+        hct:                  numOrNull('hct'),
+        plt:                  numOrNull('plt'),
+        wbc:                  numOrNull('wbc'),
         jak2:                 document.getElementById('jak2').value === 'pos',
         calr:                 document.getElementById('calr').value === 'pos',
         mpl:                  document.getElementById('mpl').value === 'pos',
+        // Fix 3: status espliciti per logica molecolare — niente DOM reads fuori da collectData
+        jak2_status:          document.getElementById('jak2').value, // 'pos'|'neg'|'not_done'
+        calr_status:          document.getElementById('calr').value,
+        mpl_status:           document.getElementById('mpl').value,
+        all_drivers_tested:   ['jak2','calr','mpl'].every(id => document.getElementById(id).value !== 'not_done'),
+        // Fix 1 v3.5: pannello parzialmente eseguito (1–2 testati, non tutti 3)
+        driver_panel_incomplete: (() => {
+            const vals = ['jak2','calr','mpl'].map(id => document.getElementById(id).value);
+            const nTested = vals.filter(v => v !== 'not_done').length;
+            return nTested > 0 && nTested < 3;
+        })(),
         triple_neg:           ['jak2','calr','mpl'].every(id => document.getElementById(id).value === 'neg'),
         mol_not_done:         ['jak2','calr','mpl'].every(id => document.getElementById(id).value === 'not_done'),
+        // PATCH 5: Other clonal marker
+        other_clonal_marker:  document.getElementById('other-clonal-marker').checked,
+        other_clonal_marker_text: document.getElementById('other-clonal-marker-text').value,
         cytogenetics:         document.getElementById('cytogenetics').value,
         cytogenetics_notes:   document.getElementById('cytogenetics-notes').value,
         splenomegaly:         document.getElementById('splenomegaly').checked,
@@ -1116,135 +1294,359 @@ function collectData() {
         anemia:               document.getElementById('anemia').checked,
         ldh_elevated:         document.getElementById('ldh').value === 'elevated',
         epo_result:           document.getElementById('epo_result').value,
-        clinical_question:    document.getElementById('clinical-question').value
+        clinical_question:    document.getElementById('clinical-question').value,
+        // PATCH: Modalità
+        strict_mode:          document.getElementById('strict-mode').checked
     };
 }
 
 // ============================================================================
-// MODALITÀ 1: WHO 2022 FORMALE
+// PATCH 7→2: WHO PRIMARY — RANKING PER SOLIDITÀ + SUBSCORE CRITERI
+// subscore viene iniettato da runWHOFormal come { majMet, minMet }
+// ============================================================================
+function getWHOPrimary(who) {
+    const order = ['pv','et','pre','pmf'];
+    const solidityScore = dx => dx === 'CONFERMATO' ? 3 : dx === 'PROBABILE' ? 1 : 0;
+    const ranked = order
+        .map(k => ({
+            key: k,
+            dx:  who[k].dx,
+            solid: solidityScore(who[k].dx),
+            // subscore per tiebreaker (iniettato da runWHOFormal)
+            majMet: who[k]._majMet || 0,
+            minMet: who[k]._minMet || 0
+        }))
+        .filter(x => x.solid > 0)
+        .sort((a,b) => {
+            if (b.solid !== a.solid) return b.solid - a.solid;
+            // tiebreaker 1: più criteri maggiori soddisfatti
+            if (b.majMet !== a.majMet) return b.majMet - a.majMet;
+            // tiebreaker 2: più criteri minori soddisfatti
+            return b.minMet - a.minMet;
+        });
+    return ranked.length ? ranked[0].key : null;
+}
+
+
+// Fix 2+3: computeHasMut — solo data, niente getElementById
+function computeHasMut(data) {
+    const driverMut = data.jak2 || data.calr || data.mpl;
+    if (driverMut) return 'driver';
+    if (!data.other_clonal_marker) return false;
+    const textOk = data.other_clonal_marker_text && data.other_clonal_marker_text.trim() !== '';
+    if (!textOk) return false;
+    // Fix 3: usa data.all_drivers_tested (calcolato in collectData, no DOM)
+    return data.all_drivers_tested ? 'other_full' : 'other_partial';
+}
+
+// Helpers semantici sul valore restituito da computeHasMut
+function hasMutFull(val)    { return val === 'driver' || val === 'other_full'; }
+function hasMutPartial(val) { return val === 'other_partial'; }
+function hasMutAny(val)     { return !!val; }
+
+// Fix 4 v3.14: checkbox + testo non vuoto — unico gate per "altro clonale valido"
+function hasValidOtherClonal(data) {
+    return !!(data.other_clonal_marker &&
+              data.other_clonal_marker_text &&
+              data.other_clonal_marker_text.trim());
+}
+
+// ============================================================================
+// MODALITÀ 1: WHO 2022 FORMALE — con tutte le patch
 // ============================================================================
 function runWHOFormal(data) {
     const hbT  = data.sex === 'M' ? 16.5 : 16.0;
     const hctT = data.sex === 'M' ? 49   : 48;
+    const hasMut = computeHasMut(data); // 'driver'|'other_full'|'other_partial'|false
 
-    // PV
+    // ── MDS DIMMER (Fix 3) ──
+    // Invece di interruttore binario: livelli MDS-likely / MDS-possible / not-supported
+    function getMdsProbability(blasts, dysplasia, cytogenetics, cytoNotes) {
+        let mdsScore = 0;
+        // Criteri forti (peso 3)
+        if (dysplasia === 'multilineage') mdsScore += 3;
+        if (blasts !== null && blasts >= 10 && blasts < 20) mdsScore += 3;
+        else if (blasts !== null && blasts >= 5 && blasts < 10) mdsScore += 2; // zona grigia: MPN con accentuata maturazione
+        // Citogenetica forte per MDS (peso 2): del5q, monosomia7, complesso
+        const mdsCytoStrong = ['del5q','complex'].includes(cytogenetics) ||
+            /monosomia\s*7|del.*7q|-7/i.test(cytoNotes||'');
+        if (mdsCytoStrong) mdsScore += 2;
+        // Citogenetica debole (peso 1): trisomia 8, del20q — aspecifici, presenti anche in NMC
+        const mdsCytoWeak = ['trisomy8','del20q'].includes(cytogenetics);
+        if (mdsCytoWeak) mdsScore += 1;
+        // Blasti 2-4%: zona grigia ma non significativa per esclusione MPN
+        if (blasts !== null && blasts >= 2 && blasts < 5) mdsScore += 1;
+        if (mdsScore >= 5) return 'likely';
+        if (mdsScore >= 2) return 'possible';
+        return 'not_supported';
+    }
+    const mdsLevel = getMdsProbability(data.blasts_percent, data.dysplasia, data.cytogenetics, data.cytogenetics_notes);
+    const cmlF = data.cytogenetics === 't9_22';
+    const pvHb = (data.hb !== null && data.hb > hbT) || (data.hct !== null && data.hct > hctT);
+
+    // MDS esclude fortemente solo se "likely"; se "possible" → warning; se "not_supported" → non blocca
+    const mdsExcludeStrong = mdsLevel === 'likely';
+    const mdsExcludeWeak   = mdsLevel === 'possible';
+
+    // ── PV ──
     let pvMaj = 0, pvMin = 0, pvDetails = [];
-    const pvHb = (data.hb && data.hb > hbT) || (data.hct && data.hct > hctT);
-    pvDetails.push({ met: pvHb, label: `Hb/Hct >soglia (${hbT}/${hctT})` });
+    pvDetails.push({ met: data.hb !== null || data.hct !== null ? pvHb : null,
+        label: `Hb/Hct >soglia (>${hbT} g/dL · >${hctT}%)${data.hb !== null?' Hb='+data.hb:''}${data.hct !== null?' Hct='+data.hct:''}` });
     if (pvHb) pvMaj++;
-    const pvBx = data.proliferation === 'panmyelosis' && data.megakaryocyte === 'pleomorphic';
-    pvDetails.push({ met: pvBx, label: 'Panmielosi + megacariociti pleomorfi' });
-    if (pvBx) pvMaj++;
-    pvDetails.push({ met: data.jak2, label: 'JAK2 V617F' });
-    if (data.jak2) pvMaj++;
-    const epoMin = data.epo_result === 'subnormal';
-    pvDetails.push({ met: epoMin ? true : null, label: `EPO${data.epo_result ? ': '+data.epo_result : ': N/E'}` });
-    if (epoMin) pvMin++;
-    const pvDx = (pvMaj >= 3) || (pvMaj >= 2 && pvMin >= 1);
 
-    // ET
+    const pvBx = data.proliferation === 'panmyelosis' && data.megakaryocyte === 'pleomorphic';
+    const pvCellOk = data.cellularity === 'increased';
+    let pvBxMet;
+    if (data.strict_mode) {
+        pvBxMet = pvBx && pvCellOk;
+        pvDetails.push({ met: pvBxMet,
+            label: `Panmielosi + megacariociti pleomorfi + ipercellularità per età${pvBx && !pvCellOk ? ' ⚠ cellularità non documentata come aumentata' : ''}` });
+    } else {
+        pvBxMet = pvBx;
+        pvDetails.push({ met: pvBxMet,
+            label: `Panmielosi + megacariociti pleomorfi${pvBx && !pvCellOk ? ' (cellularità non confermata per età — expert mode OK)' : ''}` });
+    }
+    if (pvBxMet) pvMaj++;
+
+    // Fix 3 v3.14: JAK2 not_done = null (non valutabile), non false (negativo)
+    const jak2Crit = data.jak2_status === 'pos' ? true :
+                     data.jak2_status === 'neg' ? false : null;
+    pvDetails.push({ met: jak2Crit,
+        label: jak2Crit === null ? 'JAK2 V617F (non eseguito — criterio non valutabile)' : 'JAK2 V617F' });
+    if (jak2Crit === true) pvMaj++;
+    const epoMin = data.epo_result === 'subnormal';
+    pvDetails.push({ met: epoMin ? true : (data.epo_result ? false : null), label: `EPO${data.epo_result ? ': '+data.epo_result : ': N/E'}` });
+    if (epoMin) pvMin++;
+
+    let pvDx = (pvMaj >= 3) || (pvMaj >= 2 && pvMin >= 1) ? 'CONFERMATO' : 'ESCLUSO';
+
+    // Fix 1 v3.14 / Fix 2 v3.14: PV — gate CML/MDS simmetrico; pvDeclassNote per summary narrativo
+    let pvDeclassNote = null;
+    if (cmlF && pvDx === 'CONFERMATO') {
+        pvDx = 'ESCLUSO';
+        pvDeclassNote = 'criteri soddisfatti ma esclusa da t(9;22)';
+        pvDetails.push({ met: false, label: '⚠ t(9;22) BCR::ABL1 — esclude NMC/PV (→ CML)' });
+    } else if (mdsExcludeStrong && pvDx === 'CONFERMATO') {
+        pvDx = 'PROBABILE';
+        pvDeclassNote = `criteri soddisfatti ma limitati da contesto MDS-likely`;
+        pvDetails.push({ met: 'partial', label: `⚠ Contesto MDS-likely (${getMdsFlagDetail(data)}) — max PROBABILE` });
+    } else if (mdsExcludeWeak && pvDx === 'CONFERMATO') {
+        pvDeclassNote = `contesto MDS-possible — conferma richiesta`;
+        pvDetails.push({ met: 'partial', label: `⚠ Contesto MDS-possible (${getMdsFlagDetail(data)}) — conferma richiesta` });
+    }
+
+    // ── ET ──
     let etMet = 0, etPartial = 0, etDetails = [];
     const etPlt = data.plt !== null && data.plt >= 450;
     etDetails.push({ met: data.plt === null ? null : etPlt, label: `PLT ${data.plt !== null ? data.plt+'×10⁹/L' : 'N/V'} (≥450)` });
     if (etPlt) etMet++;
-    const etMeg = data.megakaryocyte === 'hyperlobulated';
-    etDetails.push({ met: etMeg, label: 'Megacariociti iperlobulati maturi' });
-    if (etMeg) etMet++;
-    const pvF  = pvHb;
-    const pmfF = data.fibrosis !== null && data.fibrosis >= 2;
-    const cmlF = data.cytogenetics === 't9_22';
-    const mdsF = data.blasts_percent !== null && data.blasts_percent >= 5;
-    const etExcl = !pvF && !pmfF && !cmlF && !mdsF;
-    etDetails.push({ met: etExcl, label: `Esclusione PV/PMF/CML/MDS${!etExcl ? ' ✗' : ''}` });
-    if (etExcl) etMet++;
-    const hasMut = data.jak2 || data.calr || data.mpl;
-    if (hasMut) {
-        etDetails.push({ met: true, label: `Driver: ${[data.jak2&&'JAK2',data.calr&&'CALR',data.mpl&&'MPL'].filter(Boolean).join('+')}` });
-        etMet++;
-    } else if (data.triple_neg) {
-        etDetails.push({ met: 'partial', label: 'Triple-neg: clonalità alternativa richiesta' });
-        etPartial++;
-    } else {
-        etDetails.push({ met: false, label: 'Nessuna mutazione guida' });
-    }
-    let etDx;
-    if (etMet === 4)                          etDx = 'CONFERMATO';
-    else if (etMet === 3 && etPartial === 1)  etDx = 'PROBABILE';
-    else                                       etDx = 'ESCLUSO';
 
-    // PRE-PMF
+    const etMeg = data.megakaryocyte === 'hyperlobulated';
+    const etProliferationOk = data.proliferation === 'megakaryocytic' || data.proliferation === 'minimal' || data.proliferation === '';
+    if (data.strict_mode) {
+        const etMegFull = etMeg && etProliferationOk;
+        etDetails.push({ met: etMegFull,
+            label: `Megacariociti iperlobulati + proliferazione prevalentemente Mk${etMeg && !etProliferationOk ? ' ⚠ proliferazione granulocitaria presente' : ''}` });
+        if (etMegFull) etMet++;
+        else if (etMeg) etPartial++;
+    } else {
+        etDetails.push({ met: etMeg, label: 'Megacariociti iperlobulati maturi' });
+        if (etMeg) etMet++;
+    }
+
+    const pmfF = data.fibrosis !== null && data.fibrosis >= 2;
+    // Fix 3: MDS-likely blocca; MDS-possible rende il criterio PARTIAL (non pieno)
+    const etExcl   = !pvHb && !pmfF && !cmlF && !mdsExcludeStrong && !mdsExcludeWeak;
+    const etExclWk = !pvHb && !pmfF && !cmlF && !mdsExcludeStrong && mdsExcludeWeak;
+    let etExclLabel = `Esclusione PV/PMF/CML`;
+    if (pvHb || pmfF || cmlF || mdsExcludeStrong) {
+        const why2 = [pvHb&&'PV',pmfF&&'PMF',cmlF&&'CML',mdsExcludeStrong&&`MDS-likely (${getMdsFlagDetail(data)})`].filter(Boolean);
+        etExclLabel += ` ✗ (${why2.join(', ')})`;
+    } else if (mdsExcludeWeak) {
+        etExclLabel += ` [⚠ MDS-possible: ${getMdsFlagDetail(data)} — criterio parziale]`;
+    }
+    const etExclMet = etExcl ? true : (etExclWk ? 'partial' : false);
+    etDetails.push({ met: etExclMet, label: etExclLabel });
+    if (etExcl) etMet++;
+    else if (etExclWk) etPartial++; // MDS-possible: conta come partial, non major pieno
+
+    // Fix 1+4 v3.14: criterio molecolare ET — pannello incompleto ≠ negativo
+    if (hasMutFull(hasMut)) {
+        const mutStr = [data.jak2&&'JAK2',data.calr&&'CALR',data.mpl&&'MPL',
+                        (hasMut !== 'driver') && (data.other_clonal_marker_text||'altro clonale')].filter(Boolean).map(escHtml).join('+');
+        etDetails.push({ met: true, label: `Marcatore clonale: ${mutStr}` });
+        etMet++;
+    } else if (hasMutPartial(hasMut)) {
+        etDetails.push({ met: 'partial', label: `Marcatore clonale alternativo (${escHtml(data.other_clonal_marker_text)}) — driver non tutti testati: valore PARZIALE` });
+        etPartial++;
+    } else if (data.triple_neg) {
+        etDetails.push({ met: 'partial', label: 'Triple-neg: clonalità alternativa documentata richiesta' });
+        etPartial++;
+    } else if (data.driver_panel_incomplete) {
+        etDetails.push({ met: 'partial', label: 'Pannello driver incompleto — criterio molecolare non conclusivo' });
+        etPartial++;
+    } else if (data.mol_not_done) {
+        etDetails.push({ met: null, label: 'Molecolare non eseguito — criterio non valutabile' });
+    } else {
+        etDetails.push({ met: false, label: 'Nessuna mutazione driver documentata (pannello completo)' });
+    }
+
+    let etDx;
+    if (etMet === 4)                         etDx = 'CONFERMATO';
+    else if (etMet === 3 && etPartial >= 1)  etDx = 'PROBABILE';
+    else                                     etDx = 'ESCLUSO';
+
+    let etDeclassNote = null;
+    if (data.fibrosis === null && etDx === 'CONFERMATO') {
+        etDx = 'PROBABILE';
+        etDeclassNote = 'fibrosi non valutata — max PROBABILE';
+        etDetails.push({ met: 'partial', label: '⚠ Fibrosi non valutata: esclusione MF-2 non documentata → max PROBABILE' });
+    }
+
+    // ── PRE-PMF — Fix 5: strict più rigorosa ──
     let preMaj = 0, preMin = 0, preMajDetails = [], preMinDetails = [];
     const preMeg = data.megakaryocyte === 'clustered';
+    const preCellIncr   = data.cellularity === 'increased';
+    const preGranPresent = data.proliferation === 'granulocytic';
+    const preEryReduced = data.me_ratio === 'increased';
+
     let pre1;
-    if (data.fibrosis === null)              pre1 = preMeg ? 'partial' : false;
-    else if (preMeg && data.fibrosis <= 1)  { pre1 = true; preMaj++; }
-    else if (preMeg && data.fibrosis >= 2)   pre1 = false;
-    else                                     pre1 = false;
-    preMajDetails.push({ met: pre1, label: `Atipia megacariocitaria + fibrosi ≤MF-1${data.fibrosis!==null?' (MF-'+data.fibrosis+')':' (N/V)'}` });
+    if (data.fibrosis === null) {
+        pre1 = preMeg ? 'partial' : false;
+    } else if (preMeg && data.fibrosis <= 1) {
+        if (data.strict_mode) {
+            // Fix 5: cellularità aumentata OBBLIGATORIA + ≥1 tra granulocitaria/eritroide ridotta
+            const strictContextOk = preCellIncr && (preGranPresent || preEryReduced);
+            pre1 = strictContextOk ? true : 'partial';
+            if (strictContextOk) preMaj++;
+        } else {
+            pre1 = true; preMaj++;
+        }
+    } else if (preMeg && data.fibrosis >= 2) {
+        pre1 = false;
+    } else {
+        pre1 = false;
+    }
+
+    const contextNote = data.strict_mode && preMeg && data.fibrosis !== null && data.fibrosis <= 1
+        ? ` [Strict: cellul.↑ ${preCellIncr?'✓':'✗ (obblig.)'} · ${preGranPresent?'gran.↑ ✓':''}${preEryReduced?' ery↓ ✓':''}${!preCellIncr?' → contesto insufficiente':''}]`
+        : '';
+    preMajDetails.push({ met: pre1,
+        label: `Clustering megacariocitario + atipia + fibrosi ≤MF-1${data.fibrosis!==null?' (MF-'+data.fibrosis+')':' (N/V)'}${contextNote}` });
+
     const etF2 = data.megakaryocyte === 'hyperlobulated' && data.plt !== null && data.plt >= 450;
-    const preExcl = !pvHb && !etF2 && !cmlF && !mdsF;
+    // Fix 3: pre-PMF — MDS-likely blocca; MDS-possible nota
+    // Fix 3: pre-PMF — MDS-likely blocca; MDS-possible = partial, NON incrementa preMaj
+    const preExcl   = !pvHb && !etF2 && !cmlF && !mdsExcludeStrong && !mdsExcludeWeak;
+    const preExclWk = !pvHb && !etF2 && !cmlF && !mdsExcludeStrong && mdsExcludeWeak;
+    let preExclLabel = `Esclusione PV/ET/CML`;
+    if (pvHb || etF2 || cmlF || mdsExcludeStrong) {
+        const why3 = [pvHb&&'PV',etF2&&'ET-morfo',cmlF&&'CML',mdsExcludeStrong&&`MDS-likely (${getMdsFlagDetail(data)})`].filter(Boolean);
+        preExclLabel += ` ✗ (${why3.join(', ')})`;
+    } else if (mdsExcludeWeak) {
+        preExclLabel += ` [⚠ MDS-possible: ${getMdsFlagDetail(data)} — criterio PARZIALE, non major pieno]`;
+    }
+    const preExclMet = preExcl ? true : (preExclWk ? 'partial' : false);
+    preMajDetails.push({ met: preExclMet, label: preExclLabel });
     if (preExcl) preMaj++;
-    preMajDetails.push({ met: preExcl, label: 'Esclusione PV/ET/CML/MDS' });
+    // MDS-possible: NON incrementa preMaj — il dimmer cambia il motore, non solo il testo
+
+    // Fix 1+2 v3.14: Marcatore clonale pre-PMF — pannello incompleto ≠ assente
     let pre3;
-    if (hasMut) { pre3 = true; preMaj++; }
-    else if (data.triple_neg) pre3 = 'partial';
-    else pre3 = false;
-    preMajDetails.push({ met: pre3, label: `Mutazione clonale${hasMut?' ('+[data.jak2&&'JAK2',data.calr&&'CALR',data.mpl&&'MPL'].filter(Boolean).join('+')+')':data.triple_neg?' triple-neg':' assente'}` });
+    if (hasMutFull(hasMut))              { pre3 = true; preMaj++; }
+    else if (hasMutPartial(hasMut))      { pre3 = 'partial'; }
+    else if (data.triple_neg)            { pre3 = 'partial'; }
+    else if (data.driver_panel_incomplete) { pre3 = 'partial'; }
+    else if (data.mol_not_done)          { pre3 = null; }
+    else                                 { pre3 = false; }
+    const mutStr3 = hasMutAny(hasMut) ? ' ('+ [data.jak2&&'JAK2',data.calr&&'CALR',data.mpl&&'MPL',
+        (hasMut !== 'driver') && escHtml(data.other_clonal_marker_text||'altro')].filter(Boolean).join('+') +')' : '';
+    const pre3Suffix = hasMutPartial(hasMut) ? ' — driver non tutti testati: parziale'
+                     : data.driver_panel_incomplete ? ' — pannello incompleto: parziale' : '';
+    const pre3Label = hasMutAny(hasMut) ? `Marcatore clonale${mutStr3}`
+                    : data.triple_neg ? 'Marcatore clonale (triple-neg)'
+                    : data.driver_panel_incomplete ? 'Pannello driver incompleto — criterio molecolare non conclusivo'
+                    : data.mol_not_done ? 'Marcatore clonale (N/E)' : 'Nessuna mutazione driver documentata (pannello completo)';
+    preMajDetails.push({ met: pre3, label: `${pre3Label}${pre3Suffix}` });
+
     const anemiaT = getAnemiaThreshold(data.sex, data.age);
     const anemiaOk = data.anemia || (data.hb !== null && data.hb < anemiaT);
     if (anemiaOk) preMin++;
-    const anemiaLabel = data.hb ? `Anemia (Hb ${data.hb} vs soglia ${anemiaT})` : 'Anemia';
-    preMinDetails.push({ met: anemiaOk, label: anemiaLabel });
+    preMinDetails.push({ met: anemiaOk, label: data.hb !== null ? `Anemia (Hb ${data.hb} vs soglia ${anemiaT})` : 'Anemia (clinica)' });
     const wcbHigh = data.wbc !== null && data.wbc >= 11;
     if (wcbHigh) preMin++;
-    preMinDetails.push({ met: wcbHigh, label: `Leucocitosi${data.wbc?' '+data.wbc+'×10⁹/L':''}` });
+    preMinDetails.push({ met: wcbHigh, label: `Leucocitosi${data.wbc !== null?' '+data.wbc+'×10⁹/L':''}` });
     if (data.splenomegaly) preMin++;
     preMinDetails.push({ met: data.splenomegaly, label: 'Splenomegalia' });
     if (data.ldh_elevated) preMin++;
     preMinDetails.push({ met: data.ldh_elevated, label: 'LDH elevato' });
+
     const pre1Met = preMajDetails[0].met === true;
     let preDx;
-    if (preMaj >= 3 && preMin >= 1)                preDx = 'CONFERMATO';
+    if (preMaj >= 3 && preMin >= 1)                 preDx = 'CONFERMATO';
     else if (preMaj >= 2 && preMin >= 1 && pre1Met) preDx = 'PROBABILE';
     else                                            preDx = 'ESCLUSO';
 
-    // PMF
+    let preDeclassNote = null;
+    if (data.fibrosis === null && preDx === 'CONFERMATO') {
+        preDx = 'PROBABILE';
+        preDeclassNote = 'fibrosi non valutata — max PROBABILE';
+        preMajDetails.push({ met: 'partial', label: '⚠ Fibrosi non valutata — discriminante Pre-PMF vs PMF → max PROBABILE' });
+    }
+    if (data.mol_not_done && !hasMutAny(hasMut) && preDx === 'CONFERMATO') {
+        preDx = 'PROBABILE';
+        preDeclassNote = preDeclassNote || 'molecolare non eseguito — max PROBABILE';
+        preMajDetails.push({ met: 'partial', label: '⚠ Pannello molecolare non eseguito → max PROBABILE' });
+    }
+
+    // ── PMF ──
     let pmfMaj = 0, pmfMin = 0, pmfMajD = [], pmfMinD = [];
     let pmf1Met = false;
     if (data.fibrosis === null) {
-        pmfMajD.push({ met: data.megakaryocyte==='clustered'?'partial':false, label: `Clustering + fibrosi MF-2/3 (fibrosi N/V)` });
+        pmfMajD.push({ met: data.megakaryocyte==='clustered'?'partial':false, label: `Clustering + fibrosi MF-2/3 (fibrosi N/V — dato mancante)` });
     } else if (data.megakaryocyte === 'clustered' && data.fibrosis >= 2) {
         pmf1Met = true; pmfMaj++;
-        pmfMajD.push({ met: true, label: `Clustering + fibrosi MF-${data.fibrosis}` });
+        pmfMajD.push({ met: true, label: `Clustering megacariocitario + fibrosi MF-${data.fibrosis}` });
     } else {
-        pmfMajD.push({ met: false, label: `Clustering/fibrosi insufficienti (MF-${data.fibrosis!==null?data.fibrosis:'N/V'})` });
+        pmfMajD.push({ met: false, label: `Clustering o fibrosi insufficienti (MF-${data.fibrosis!==null?data.fibrosis:'N/V'})` });
     }
-    // Esclusione MDS per PMF: blast-based + displasia multilineare + citogenetica MDS-type
-    const mdsCyto = ['del5q','trisomy8','del20q','complex'].includes(data.cytogenetics) ||
-                    /monosomia\s*7|del.*7q|-7|del.*5q|-5|complex/i.test(data.cytogenetics_notes||'');
-    const mdsMultiDisp = data.dysplasia === 'multilineage';
-    const mdsBlasts = data.blasts_percent !== null && data.blasts_percent >= 5 && data.blasts_percent < 20;
-    const mdsF_pmf = mdsBlasts || mdsMultiDisp || mdsCyto;
-    const pmfExcl = !pvHb && !cmlF && !mdsF_pmf;
-    if (pmfExcl) pmfMaj++;
+
+    // Fix 3: PMF — MDS-likely blocca; MDS-possible = partial, NON incrementa pmfMaj
+    const pmfExcl   = !pvHb && !cmlF && !mdsExcludeStrong && !mdsExcludeWeak;
+    const pmfExclWk = !pvHb && !cmlF && !mdsExcludeStrong && mdsExcludeWeak;
     let pmfExclDetail;
     if (pmfExcl) {
         pmfExclDetail = 'Esclusione PV/CML/MDS';
+    } else if (pmfExclWk) {
+        pmfExclDetail = `Esclusione PV/CML [⚠ MDS-possible: ${getMdsFlagDetail(data)} — criterio PARZIALE, non major pieno]`;
     } else {
         const why = [];
-        if (pvHb)          why.push('PV: Hb/Hct');
-        if (cmlF)          why.push('CML: t(9;22)');
-        if (mdsBlasts)     why.push(`MDS: blasti ${data.blasts_percent}%`);
-        if (mdsMultiDisp)  why.push('MDS: displasia multilineare');
-        if (mdsCyto)       why.push(`MDS: citogenetica ${data.cytogenetics}`);
+        if (pvHb)              why.push('PV: Hb/Hct');
+        if (cmlF)              why.push('CML: t(9;22)');
+        if (mdsExcludeStrong)  why.push(`MDS-likely: ${getMdsFlagDetail(data)}`);
         pmfExclDetail = `Esclusione PV/CML/MDS ✗ (${why.join(', ')})`;
     }
-    pmfMajD.push({ met: pmfExcl, label: pmfExclDetail });
+    const pmfExclMet = pmfExcl ? true : (pmfExclWk ? 'partial' : false);
+    if (pmfExcl) pmfMaj++;
+    // MDS-possible: NON incrementa pmfMaj
+    pmfMajD.push({ met: pmfExclMet, label: pmfExclDetail });
+
+    // Fix 1+2 v3.14: Marcatore clonale PMF — pannello incompleto ≠ assente
     let pmf3;
-    if (hasMut) { pmf3 = true; pmfMaj++; }
-    else if (data.triple_neg) pmf3 = 'partial';
-    else pmf3 = false;
-    pmfMajD.push({ met: pmf3, label: `Mutazione clonale` });
+    if (hasMutFull(hasMut))                { pmf3 = true; pmfMaj++; }
+    else if (hasMutPartial(hasMut))        { pmf3 = 'partial'; }
+    else if (data.triple_neg)              { pmf3 = 'partial'; }
+    else if (data.driver_panel_incomplete) { pmf3 = 'partial'; }
+    else if (data.mol_not_done)            { pmf3 = null; }
+    else                                   { pmf3 = false; }
+    const pmf3Suffix = hasMutPartial(hasMut) ? ' — driver non tutti testati: parziale'
+                     : data.driver_panel_incomplete ? ' — pannello incompleto: parziale' : '';
+    const pmf3Label = hasMutAny(hasMut) ? `Marcatore clonale${mutStr3}`
+                    : data.triple_neg ? 'Marcatore clonale (triple-neg)'
+                    : data.driver_panel_incomplete ? 'Pannello driver incompleto — criterio molecolare non conclusivo'
+                    : data.mol_not_done ? 'Marcatore clonale (N/E)' : 'Nessuna mutazione driver documentata (pannello completo)';
+    pmfMajD.push({ met: pmf3, label: `${pmf3Label}${pmf3Suffix}` });
+
     if (anemiaOk) pmfMin++;
     pmfMinD.push({ met: anemiaOk, label: `Anemia` });
     if (wcbHigh) pmfMin++;
@@ -1255,17 +1657,122 @@ function runWHOFormal(data) {
     pmfMinD.push({ met: data.ldh_elevated, label: 'LDH elevato' });
     if (data.leukoerythroblastosis) pmfMin++;
     pmfMinD.push({ met: data.leukoerythroblastosis, label: 'Leucoeritroblastosi' });
+
     let pmfDx;
     if (pmfMaj >= 3 && pmfMin >= 1)                 pmfDx = 'CONFERMATO';
     else if (pmfMaj >= 2 && pmf1Met && pmfMin >= 1) pmfDx = 'PROBABILE';
     else                                             pmfDx = 'ESCLUSO';
 
+    let pmfDeclassNote = null;
+    if (data.fibrosis === null && pmfDx === 'CONFERMATO') {
+        pmfDx = 'PROBABILE';
+        pmfDeclassNote = 'fibrosi non valutata — max PROBABILE';
+        pmfMajD.push({ met: 'partial', label: '⚠ Fibrosi non valutata — criterio discriminante → max PROBABILE' });
+    }
+    if (data.mol_not_done && !hasMutAny(hasMut) && pmfDx === 'CONFERMATO') {
+        pmfDx = 'PROBABILE';
+        pmfDeclassNote = pmfDeclassNote || 'molecolare non eseguito — max PROBABILE';
+        pmfMajD.push({ met: 'partial', label: '⚠ Pannello molecolare non eseguito → max PROBABILE' });
+    }
+
+    // Fix 1 v3.14: gate campione inadeguato — declassNote + riga details per tutti i rami (simmetria completa)
+    if (data.biopsy_quality === 'inadequate') {
+        if (pvDx  === 'CONFERMATO') { pvDx  = 'PROBABILE'; pvDeclassNote  = pvDeclassNote  || 'campione inadeguato — max PROBABILE';
+            pvDetails.push({ met: 'partial', label: '⚠ Campione inadeguato — classificazione definitiva non possibile' }); }
+        if (etDx  === 'CONFERMATO') { etDx  = 'PROBABILE'; etDeclassNote  = etDeclassNote  || 'campione inadeguato — max PROBABILE';
+            etDetails.push({ met: 'partial', label: '⚠ Campione inadeguato — classificazione definitiva non possibile' }); }
+        if (preDx === 'CONFERMATO') { preDx = 'PROBABILE'; preDeclassNote = preDeclassNote || 'campione inadeguato — max PROBABILE';
+            preMajDetails.push({ met: 'partial', label: '⚠ Campione inadeguato — classificazione definitiva non possibile' }); }
+        if (pmfDx === 'CONFERMATO') { pmfDx = 'PROBABILE'; pmfDeclassNote = pmfDeclassNote || 'campione inadeguato — max PROBABILE';
+            pmfMajD.push({ met: 'partial', label: '⚠ Campione inadeguato — classificazione definitiva non possibile' }); }
+    }
+
     return {
-        pv:  { dx: pvDx  ? 'CONFERMATO':'ESCLUSO', details: pvDetails, summary: `Maggiori ${pvMaj}/3, Minori ${pvMin}/1` },
-        et:  { dx: etDx,  details: etDetails, summary: `Criteri ${etMet}/4${etPartial?' +'+etPartial+' parziale':''}` },
-        pre: { dx: preDx, majDetails: preMajDetails, minDetails: preMinDetails, summary: `Maggiori ${preMaj}/3, Minori ${preMin}/4`, tripleNeg: data.triple_neg && !hasMut },
-        pmf: { dx: pmfDx, majDetails: pmfMajD, minDetails: pmfMinD, summary: `Maggiori ${pmfMaj}/3, Minori ${pmfMin}/5` }
+        pv:  { dx: pvDx,  details: pvDetails,
+               summary: `Maggiori ${pvMaj}/3, Minori ${pvMin}/1${pvDeclassNote ? ' — '+pvDeclassNote : ''}`,
+               _majMet: pvMaj, _minMet: pvMin },
+        et:  { dx: etDx,  details: etDetails,
+               summary: `Criteri ${etMet}/4${etPartial?' +'+etPartial+' parziale':''}${etDeclassNote ? ' — '+etDeclassNote : ''}`,
+               _majMet: etMet, _minMet: etPartial },
+        pre: { dx: preDx, majDetails: preMajDetails, minDetails: preMinDetails,
+               summary: `Maggiori ${preMaj}/3, Minori ${preMin}/4${preDeclassNote ? ' — '+preDeclassNote : ''}`,
+               tripleNeg: data.triple_neg && !hasMutAny(hasMut),
+               _majMet: preMaj, _minMet: preMin },
+        pmf: { dx: pmfDx, majDetails: pmfMajD, minDetails: pmfMinD,
+               summary: `Maggiori ${pmfMaj}/3, Minori ${pmfMin}/5${pmfDeclassNote ? ' — '+pmfDeclassNote : ''}`,
+               _majMet: pmfMaj, _minMet: pmfMin },
+        mdsLevel // esposto per confidence score e red flags
     };
+}
+
+// Helper MDS flag detail (Fix 3)
+function getMdsFlagDetail(data) {
+    const parts = [];
+    if (data.dysplasia === 'multilineage') parts.push('displasia multilineare');
+    if (data.blasts_percent !== null && data.blasts_percent >= 5) parts.push(`blasti ${data.blasts_percent}%`);
+    if (['del5q','complex'].includes(data.cytogenetics)) parts.push(`citogenetica ${escHtml(data.cytogenetics)}`);
+    if (/monosomia\s*7|del.*7q|-7/i.test(data.cytogenetics_notes||'')) parts.push('monosomia 7');
+    if (['trisomy8','del20q'].includes(data.cytogenetics)) parts.push(`${escHtml(data.cytogenetics)} (aspecifico)`);
+    return parts.join(', ') || 'N/V';
+}
+
+// ============================================================================
+// FIX 8: CONFIDENCE SCORE — raffinato
+// ============================================================================
+function computeConfidence(data, who, morfo) {
+    let score = 100;
+    let notes = [];
+
+    if (data.biopsy_quality === 'inadequate')      { score -= 35; notes.push('Campione inadeguato'); }
+    else if (data.biopsy_quality === 'suboptimal') { score -= 15; notes.push('Campione subottimale'); }
+    else if (!data.biopsy_quality)                 { score -= 5;  notes.push('Qualità campione non specificata'); }
+
+    if (data.fibrosis === null) { score -= 20; notes.push('Fibrosi non valutata (Gomori)'); }
+
+    const hbPlt = [data.hb, data.plt, data.wbc].filter(v => v !== null && v !== undefined);
+    if (hbPlt.length === 0)    { score -= 15; notes.push('Emocromo assente'); }
+    else if (hbPlt.length < 3) { score -= 7;  notes.push('Emocromo parziale'); }
+
+    // Fix 2: penalità molecolare granulata (driver/other_full=ok, other_partial=-10, niente=-20)
+    const hasMut = computeHasMut(data);
+    if (!hasMutAny(hasMut)) {
+        if (data.mol_not_done) { score -= 20; notes.push('Molecolare non eseguito'); }
+        else if (data.driver_panel_incomplete) { score -= 12; notes.push('Pannello driver incompleto (non tutti testati)'); }
+        else if (data.triple_neg) { score -= 10; notes.push('Triple-neg senza clonalità alternativa documentata'); }
+    } else if (hasMutPartial(hasMut)) {
+        score -= 10;
+        notes.push('Clonalità alternativa parziale: driver non tutti testati — solidità limitata');
+    }
+    // Fix 2: other_partial non protegge dalla penalità se mol_not_done
+    if (data.mol_not_done && hasMutPartial(hasMut)) {
+        score -= 5;
+        notes.push('Driver molecolari non completati nonostante marcatore clonale alternativo');
+    }
+
+    // WHO vs morfologia
+    const whoPrimary = getWHOPrimary(who);
+    const morphoPrimary = morfo.ranked[0][0];
+    const morfoMap = { ET:'et', PV:'pv', PrePMF:'pre', PMF:'pmf' };
+    if (whoPrimary && morfoMap[morphoPrimary] && whoPrimary !== morfoMap[morphoPrimary] && morfo.ranked[0][1] > 40) {
+        score -= 10; notes.push('Discordanza WHO/morfologia');
+    }
+    // CALR+ con PV primaria = conflitto forte
+    if (data.calr && !data.jak2 && whoPrimary === 'pv') {
+        score -= 15; notes.push('CALR+ incongruente con PV (JAK2 atteso)');
+    }
+    // Più PROBABILE simultanee
+    const nProbable = ['pv','et','pre','pmf'].filter(k => who[k].dx === 'PROBABILE').length;
+    if (nProbable >= 2) { score -= 10 * (nProbable - 1); notes.push(`${nProbable} diagnosi PROBABILE simultanee`); }
+    // MDS-likely
+    if (who.mdsLevel === 'likely') { score -= 10; notes.push('MDS-likely: classificazione NMC meno sicura'); }
+
+    score = Math.max(0, score);
+    let level, color;
+    if (score >= 70)      { level = 'ALTA';     color = 'var(--success)'; }
+    else if (score >= 40) { level = 'MODERATA'; color = 'var(--warning)'; }
+    else                  { level = 'BASSA';    color = 'var(--danger)'; }
+
+    return { score, level, color, notes };
 }
 
 // ============================================================================
@@ -1283,16 +1790,15 @@ function runPatternMorfo(data) {
     if (data.me_ratio === 'normal') { scores.ET+=10; reasoning.ET.push({t:'M/E normale',p:+10}); }
     const hbT = data.sex==='M'?16.5:16.0;
     if (data.hb !== null && data.hb > hbT) { scores.ET-=40; reasoning.ET.push({t:`Hb ${data.hb} → PV`,p:-40}); }
-    if (data.plt !== null && data.plt >= 800 && data.megakaryocyte === 'hyperlobulated') {
-        scores.ET+=15; reasoning.ET.push({t:'PLT ≥800 + iperlobulati (ET alta)',p:+15}); }
+    if (data.proliferation === 'granulocytic') { scores.ET-=15; reasoning.ET.push({t:'Proliferazione granulocitaria → contro ET pura',p:-15}); }
 
     // PV
     if (data.proliferation === 'panmyelosis') { scores.PV+=35; reasoning.PV.push({t:'Panmielosi trilineare',p:+35}); }
-    if (data.cellularity === 'increased') { scores.PV+=25; reasoning.PV.push({t:'Cellularità aumentata',p:+25}); }
+    if (data.cellularity === 'increased') { scores.PV+=25; reasoning.PV.push({t:'Cellularità aumentata per età',p:+25}); }
     if (data.me_ratio === 'decreased'||data.me_ratio === 'inverted') { scores.PV+=30; reasoning.PV.push({t:'M/E ridotto (eritropoiesi accelerata)',p:+30}); }
     if (data.megakaryocyte === 'pleomorphic') { scores.PV+=20; reasoning.PV.push({t:'Megacariociti pleomorfi',p:+20}); }
     if (data.ecadherin === 'increased') { scores.PV+=15; reasoning.PV.push({t:'E-caderina aumentata (supportivo)',p:+15}); }
-    else if (data.ecadherin === 'absent') { scores.PV-=20; reasoning.PV.push({t:'E-caderina assente',p:-20}); }
+    else if (data.ecadherin === 'reduced' || data.ecadherin === 'absent') { scores.PV-=20; reasoning.PV.push({t:'E-caderina ridotta/assente',p:-20}); }
     if ((data.hb !== null && data.hb > hbT)||(data.hct !== null && data.hct > (data.sex==='M'?49:48))) {
         scores.PV+=15; reasoning.PV.push({t:'Hb/Hct >soglia PV',p:+15}); }
     if (data.fibrosis !== null && data.fibrosis >= 2) {
@@ -1303,11 +1809,11 @@ function runPatternMorfo(data) {
     if (data.fibrosis !== null && data.fibrosis >= 2) {
         const b = data.fibrosis===3?45:40; scores.PMF+=b; reasoning.PMF.push({t:`Fibrosi MF-${data.fibrosis}`,p:+b}); }
     if (data.cd61 === 'clustered'||data.cd61 === 'atypical') { scores.PMF+=15; reasoning.PMF.push({t:'CD61 aggregazione/atipie',p:+15}); }
-    if (data.me_ratio === 'increased') { scores.PMF+=15; reasoning.PMF.push({t:'M/E aumentato',p:+15}); }
-    if (data.ecadherin === 'absent') { scores.PMF+=20; reasoning.PMF.push({t:'E-caderina ridotta',p:+20}); }
+    if (data.me_ratio === 'increased') { scores.PMF+=15; reasoning.PMF.push({t:'M/E aumentato (eritroide relativa ridotta)',p:+15}); }
+    if (data.ecadherin === 'reduced' || data.ecadherin === 'absent') { scores.PMF+=20; reasoning.PMF.push({t:'E-caderina ridotta/assente',p:+20}); }
     if (data.leukoerythroblastosis) { scores.PMF+=15; reasoning.PMF.push({t:'Leucoeritroblastosi',p:+15}); }
     if (data.fibrosis !== null && data.fibrosis <= 1 && data.cd61 !== 'clustered') {
-        scores.PMF-=40; reasoning.PMF.push({t:'Fibrosi minima senza atipia',p:-40}); }
+        scores.PMF-=40; reasoning.PMF.push({t:'Fibrosi minima senza atipia CD61',p:-40}); }
 
     // Pre-PMF
     if (data.megakaryocyte === 'clustered') { scores.PrePMF+=30; reasoning.PrePMF.push({t:'Aggregazione megacariociti',p:+30}); }
@@ -1315,8 +1821,10 @@ function runPatternMorfo(data) {
     else if (data.fibrosis === 0) { scores.PrePMF+=8; reasoning.PrePMF.push({t:'MF-0 con aggregazione (sovrapposizione ET)',p:+8}); }
     else if (data.fibrosis === null) { reasoning.PrePMF.push({t:'Fibrosi N/V — dato critico mancante',p:0}); }
     else if (data.fibrosis >= 2) { scores.PrePMF-=50; reasoning.PrePMF.push({t:'Fibrosi marcata → PMF overt',p:-50}); }
-    if (data.plt !== null && data.plt >= 800 && data.megakaryocyte === 'hyperlobulated') {
-        scores.PrePMF-=25; reasoning.PrePMF.push({t:'PLT ≥800 + iperlobulati → ET vera',p:-25}); }
+    // Contributo cellularità e granulocitaria (PATCH 1)
+    if (data.cellularity === 'increased') { scores.PrePMF+=10; reasoning.PrePMF.push({t:'Cellularità aumentata (supportivo pre-PMF)',p:+10}); }
+    if (data.proliferation === 'granulocytic') { scores.PrePMF+=10; reasoning.PrePMF.push({t:'Proliferazione granulocitaria (contesto pre-PMF)',p:+10}); }
+    if (data.me_ratio === 'increased') { scores.PrePMF+=8; reasoning.PrePMF.push({t:'M/E aumentato (eritroide relativa ridotta)',p:+8}); }
 
     Object.keys(scores).forEach(k => scores[k] = Math.min(100, Math.max(0, scores[k])));
     const sorted = Object.entries(scores).sort((a,b)=>b[1]-a[1]);
@@ -1331,57 +1839,80 @@ function runClinMol(data) {
     const hctT = data.sex==='M'?49:48;
     let items = [];
 
-    // Mutazioni con bias differenziale
     if (data.jak2) {
         items.push({ label:'JAK2 V617F', value:'POSITIVO', type:'pos', bias:'PV ≫ ET > Pre-PMF',
             note:'JAK2 presente in ~95% PV, ~55% ET, ~50% PMF' });
     }
     if (data.calr) {
         items.push({ label:'CALR', value:'MUTATO', type:'pos', bias:'ET / Pre-PMF',
-            note:'CALR tipo 1 → orientamento PMF; tipo 2 → orientamento ET (sottotipo non discriminabile senza sequenziamento)' });
+            note:'Tipo 1 → orientamento PMF; Tipo 2 → orientamento ET (senza sequenziamento allele-specifico: non discriminabile)' });
     }
     if (data.mpl) {
         items.push({ label:'MPL', value:'MUTATO', type:'pos', bias:'PMF > ET',
             note:'MPL W515L/K: associazione preferenziale PMF e fibrosi progressiva' });
     }
+    // Fix 2 v3.5: other_clonal_marker riflette esattamente la logica di computeHasMut
+    if (data.other_clonal_marker) {
+        const textOk = data.other_clonal_marker_text && data.other_clonal_marker_text.trim() !== '';
+        items.push({
+            label: textOk
+                ? `Altro marcatore clonale (${escHtml(data.other_clonal_marker_text)})`
+                : 'Altro marcatore clonale',
+            value: textOk ? 'DOCUMENTATO' : 'NON SPECIFICATO',
+            type:  textOk ? 'partial' : 'neg',
+            bias:  textOk ? 'Supporta clonalità — non driver MPN' : '—',
+            note:  textOk
+                ? 'Rilevante per classificazione triple-neg — non sostituisce JAK2/CALR/MPL per il bias d\'entità'
+                : '⚠ Checkbox selezionato ma variante non specificata: non conteggiabile nella logica WHO'
+        });
+    }
+    // triple_neg è true solo se JAK2/CALR/MPL tutti === 'neg', quindi all_drivers_tested è sempre true qui
     if (data.triple_neg) {
-        items.push({ label:'Triple-negativo', value:'CONFERMATO', type:'partial', bias:'Incerto',
-            note:'JAK2/CALR/MPL tutti negativi. Richiede esclusione reattiva + mutazione clonale alternativa (ASXL1, EZH2, TET2, IDH1/2, SRSF2, SF3B1)' });
+        items.push({ label:'Triple-negativo', value:'TRIPLO-NEG (driver testati)', type:'partial', bias:'Incerto — escludere reattivo',
+            note: 'JAK2/CALR/MPL testati e negativi. WHO 2022: richiede mutazione clonale alternativa documentata (ASXL1, EZH2, TET2, IDH1/2, SRSF2, SF3B1).' });
     }
-    if (!data.jak2 && !data.calr && !data.mpl && !data.triple_neg) {
+    // Fix 1 v3.14: mol_not_done ha precedenza assoluta — altro clonale non sostituisce JAK2/CALR/MPL per WHO
+    const canonicalDriverFound = data.jak2 || data.calr || data.mpl;
+    if (data.mol_not_done) {
         items.push({ label:'Pannello mutazioni driver', value:'NON ESEGUITO', type:'neg', bias:'—',
-            note: data.mol_not_done
-                ? 'Eseguire JAK2 V617F come minimo. Senza dato molecolare la classificazione WHO 2022 è incompleta.'
-                : 'Dati insufficienti per classificazione' });
+            note: 'JAK2/CALR/MPL non eseguiti. Un marcatore clonale alternativo supporta la clonalità ma non sostituisce il pannello driver canonico per la classificazione WHO 2022.' });
+    } else if (data.driver_panel_incomplete && !canonicalDriverFound) {
+        const dPos = [data.jak2_status==='pos'&&'JAK2', data.calr_status==='pos'&&'CALR', data.mpl_status==='pos'&&'MPL'].filter(Boolean).join(', ');
+        const dNeg = [data.jak2_status==='neg'&&'JAK2', data.calr_status==='neg'&&'CALR', data.mpl_status==='neg'&&'MPL'].filter(Boolean).join(', ');
+        const dNd  = [data.jak2_status==='not_done'&&'JAK2', data.calr_status==='not_done'&&'CALR', data.mpl_status==='not_done'&&'MPL'].filter(Boolean).join(', ');
+        items.push({ label:'Pannello mutazioni driver', value:'INCOMPLETO', type:'partial', bias:'—',
+            note: `Positivi: ${dPos||'nessuno'} · Negativi: ${dNeg||'nessuno'} · Non testati: ${dNd||'nessuno'}.` });
     }
+    // Nota: il ramo "nessun driver documentato" era logicamente morto —
+    // se !jak2 && !calr && !mpl && !triple_neg && !driver_panel_incomplete → mol_not_done lo intercetta sempre
 
-    // Emocromo interpretato
-    if (data.hb && data.hb > hbT) items.push({ label:`Hb ${data.hb} g/dL`, value:'ALTA', type:'pos', bias:'PV', note:`Soglia PV: >${hbT}` });
-    if (data.hct && data.hct > hctT) items.push({ label:`Hct ${data.hct}%`, value:'ALTO', type:'pos', bias:'PV', note:`Soglia PV: >${hctT}%` });
-    if (data.plt && data.plt >= 450) items.push({ label:`PLT ${data.plt}×10⁹/L`, value: data.plt>=1000?'MOLTO ALTA':'ALTA', type:'pos', bias: data.plt>=800?'ET (trombocitosi estrema)':'ET/Pre-PMF', note:'PLT ≥800: forte orientamento ET' });
-    if (data.wbc && data.wbc >= 11) items.push({ label:`WBC ${data.wbc}×10⁹/L`, value:'LEUCOCITOSI', type:'partial', bias:'PMF/Pre-PMF minore', note:'Criterio minore PMF e Pre-PMF' });
+    if (data.hb !== null && data.hb > hbT) items.push({ label:`Hb ${data.hb} g/dL`, value:'ALTA', type:'pos', bias:'PV', note:`Soglia PV: >${hbT} (sesso-specifica)` });
+    if (data.hct !== null && data.hct > hctT) items.push({ label:`Hct ${data.hct}%`, value:'ALTO', type:'pos', bias:'PV', note:`Soglia PV: >${hctT}%` });
+    if (data.plt !== null && data.plt >= 450) items.push({ label:`PLT ${data.plt}×10⁹/L`, value:data.plt>=1000?'MOLTO ALTA':'ALTA', type:'pos', bias:data.plt>=800?'ET (trombocitosi estrema)':'ET/Pre-PMF', note:'PLT ≥800: forte orientamento ET' });
+    if (data.wbc !== null && data.wbc >= 11) items.push({ label:`WBC ${data.wbc}×10⁹/L`, value:'LEUCOCITOSI', type:'partial', bias:'PMF/Pre-PMF minore', note:'Criterio minore PMF e Pre-PMF' });
     if (data.epo_result === 'subnormal') items.push({ label:'EPO sierica', value:'SUBNORMALE', type:'pos', bias:'PV (criterio minore)', note:'<5.0 mU/mL: criterio minore WHO PV' });
     if (data.splenomegaly) items.push({ label:'Splenomegalia', value:'PRESENTE', type:'partial', bias:'PMF/Pre-PMF', note:'Criterio minore per PMF e Pre-PMF' });
     if (data.ldh_elevated) items.push({ label:'LDH', value:'ELEVATO', type:'partial', bias:'PMF/Pre-PMF', note:'Indicatore di turnover midollare aumentato' });
     if (data.leukoerythroblastosis) items.push({ label:'Leucoeritroblastosi', value:'PRESENTE', type:'pos', bias:'PMF overt', note:'Criterio minore specifico PMF overt' });
-    if (data.monocytes_absolute && data.monocytes_absolute > 1) items.push({ label:`Monociti ${data.monocytes_absolute}×10⁹/L`, value:'ELEVATI', type:'neg', bias:'LMMC (attenzione)', note:'>1×10⁹/L persistenti: escludere LMMC prima di NMC' });
+    if (data.monocytes_absolute !== null && data.monocytes_absolute > 1) items.push({ label:`Monociti ${data.monocytes_absolute}×10⁹/L`, value:'ELEVATI', type:'neg', bias:'LMMC nel differenziale', note:'>1×10⁹/L persistenti: considerare LMMC — richiede citofluorimetria e NGS (SRSF2)' });
     if (data.cytogenetics === 't9_22') items.push({ label:'t(9;22)', value:'POSITIVO', type:'neg', bias:'CML — ESCLUDE NMC', note:'BCR/ABL esclude classificazione come NMC classica' });
 
-    // Sintesi bias molecolare
     let molBias = null;
     if (data.jak2 && !data.calr && !data.mpl) molBias = { label:'JAK2 solo', dx:'PV/ET preferenziale', color:'var(--who-color)' };
     else if (data.calr && !data.jak2) molBias = { label:'CALR solo', dx:'ET / Pre-PMF preferenziale', color:'var(--morfo-color)' };
     else if (data.mpl && !data.jak2) molBias = { label:'MPL solo', dx:'PMF preferenziale', color:'var(--mol-color)' };
-    else if (data.jak2 && (data.calr || data.mpl)) molBias = { label:'Doppia mutazione', dx:'Rivalutare — raro', color:'var(--danger)' };
+    else if (data.jak2 && (data.calr || data.mpl)) molBias = { label:'Doppia mutazione', dx:'Raro — rivalutare qualità campione DNA', color:'var(--danger)' };
 
     return { items, molBias };
 }
 
 // ============================================================================
-// RED FLAGS
+// PATCH 3: RED FLAGS — RIDOTTA ASSERTIVITÀ IHC
 // ============================================================================
 function detectRedFlags(data) {
     let flags = [];
+
+    // ── Blasti (mantieni assertività: dato quantitativo obiettivo) ──
     if (data.blasts_percent !== null && data.blasts_percent > 20)
         flags.push({ title:'BLASTI >20% — AML', msg:`Blasti ${data.blasts_percent}%`, action:'Citogenetica STAT, NGS: FLT3, NPM1, CEBPA, TP53', severity:1 });
     else if (data.blasts_percent !== null && data.blasts_percent >= 10)
@@ -1391,116 +1922,145 @@ function detectRedFlags(data) {
         flags.push({ title:'Blasti 5-9% — zona grigia NMC/MDS',
             msg:`Blasti ${data.blasts_percent}%${mdsContext?' + displasia/citogenetica MDS-type':''} — compatibile con NMC ma escludere MDS`,
             action: mdsContext
-                ? 'Alta probabilità MDS: pannello NGS (SF3B1, SRSF2, TET2, ASXL1), citofluorimetria blasti.'
-                : 'Correlare con displasia morfologica e citogenetica. Se displasia multilineare presente → MDS probabile.',
+                ? 'Contesto suggestivo per MDS: NGS (SF3B1, SRSF2, TET2, ASXL1), citofluorimetria blasti.'
+                : 'Correlare con displasia morfologica e citogenetica. Displasia multilineare → MDS probabile.',
             severity:2 });
     }
+
+    // ── PATCH 3: CD68/CD14/CD163 — pattern ancillare, non diagnosi ──
     if (data.cd68==='strong' && data.cd14==='strong' && data.cd163==='strong') {
-        const lmmc = data.monocytes_absolute !== null && data.monocytes_absolute > 1;
-        flags.push({ title: lmmc ? 'LMMC CONFERMATO' : 'LMMC SOSPETTO',
-            msg: `CD68++/CD14++/CD163++${lmmc?' + Monociti '+data.monocytes_absolute+'×10⁹/L':''}`,
-            action: lmmc ? 'LMMC confermato — esclude NMC' : 'Correlare con monociti periferici assoluti', severity:1 });
+        const monocytosisPresent = data.monocytes_absolute !== null && data.monocytes_absolute > 1;
+        flags.push({
+            title: 'Pattern CD68++/CD14++/CD163++ — correlare con monocitosi',
+            msg: `Pattern istiocitario/monocitario marcato${monocytosisPresent?' + Monociti '+data.monocytes_absolute+'×10⁹/L (≥1 soglia LMMC)':''}`,
+            action: monocytosisPresent
+                ? 'Considerare LMMC nel differenziale: richiede conferma con monocitosi persistente ≥1×10⁹/L + citofluorimetria (aumento monociti classici CD14++CD16-) + NGS (SRSF2, TET2). Diagnosi non basabile su IHC BOM isolata.'
+                : 'Pattern non specifico. Monociti assoluti non disponibili — indispensabile per differenziale LMMC. Inserire formula differenziale o richiedere al clinico.',
+            severity: monocytosisPresent ? 2 : 2
+        });
     }
-    // CD15- con MPO alta: displasia granulocitaria se blasti <20%, AML sospetto se blasti ≥20%
+
+    // ── PATCH 3: MPO alta + CD15 negativo — pattern displastico, non diagnosi ──
     if (data.mpo === 'marked' && data.cd15 === 'negative') {
         const blastHigh = data.blasts_percent !== null && data.blasts_percent >= 20;
         flags.push({
-            title: blastHigh ? 'AML SOSPETTO' : 'Displasia granulocitaria',
+            title: blastHigh ? 'Pattern displastico granulocitario — blastosi franca' : 'Pattern displastico granulocitario — MPO alta/CD15 negativo',
             msg: `MPO aumentata + CD15 negativo${data.blasts_percent !== null ? ' · Blasti ' + data.blasts_percent + '%' : ''}`,
             action: blastHigh
-                ? 'CD34, CD117, citogenetica urgente. Blastosi ≥20%: escludere AML.'
-                : 'CD15- con MPO alta in assenza di blastosi franca → displasia granulocitaria. Correlare con morfologia e citogenetica MDS.',
+                ? 'Blastosi ≥20% + displasia granulocitaria IHC: correlare con CD34, CD117, citogenetica. Non classificare come AML su IHC BOM isolata senza citofluorimetria.'
+                : 'Pattern non specifico — può rientrare in displasia granulocitaria MDS-correlata o artefatto IHC. Correlare con morfologia EE, formula differenziale, citogenetica. Non diagnostico di per sé.',
             severity: blastHigh ? 1 : 2
         });
     }
-    // CD68++/CD14- : pattern monocitario atipico — non AML
-    if (data.cd68 === 'strong' && data.cd14 === 'negative')
-        flags.push({ title:'Macrofagi/istiociti CD68+ CD14-', msg:'Possibile infiltrato istiocitario reattivo o linfoma istiocitico', action:'Correlare con clinica. Se massa o linfoadenopatia: escludere linfoma istiocitico/dendritico.', severity:2 });
-    if (data.lymphoid_percent > 20) {
-        const sev = data.lymphoid_distribution==='sheets' ? 1 : 2;
-        flags.push({ title: sev===1 ? 'LINFOMA AGGRESSIVO' : 'Linfoma midollare',
-            msg:`Linfoide ${data.lymphoid_percent}%${data.lymphoid_distribution==='sheets'?' (a tappeto)':''}`,
-            action:'Citofluorimetria, BCL2/BCL6, NGS TCR/IGH', severity:sev });
-    }
-    if (data.cd138==='high')
-        flags.push({ title:'MIELOMA SOSPETTO', msg:'CD138 >10%', action:'Immunofissazione, catene leggere libere', severity:1 });
-    if (data.cytogenetics==='t9_22')
-        flags.push({ title:'t(9;22) CML', msg:'BCR/ABL positivo — esclude NMC classiche', action:'Imatinib, valutare fase', severity:1 });
 
-    // MDS: displasia multilineare e/o citogenetica MDS-type senza blastosi franca
+    // ── PATCH 3: CD68+ CD14- — descrittivo, non classificativo ──
+    if (data.cd68 === 'strong' && data.cd14 === 'negative')
+        flags.push({ title:'Pattern macrofagico CD68+/CD14- — infiltrato istiocitario',
+            msg:'CD68 forte + CD14 assente: quadro macrofagico/istiocitario',
+            action:'Può rientrare in: istiocitosi reattiva, infiltrato istiocitario NMC-associato, raro linfoma istiocitico/dendritico. Correlare con clinica e imaging. Se lesione di massa o linfoadenopatia: approfondire con CD163, S100, CD1a, langerin.',
+            severity:2 });
+
+    // ── Linfoide ──
+    if (data.lymphoid_percent !== null && data.lymphoid_percent > 20) {
+        const sev = data.lymphoid_distribution==='sheets' ? 1 : 2;
+        flags.push({ title: sev===1 ? 'Componente linfoide dominante — pattern aggressivo' : 'Componente linfoide aumentata — valutare linfoma',
+            msg:`Linfoide ${data.lymphoid_percent}%${data.lymphoid_distribution==='sheets'?' (a tappeto — pattern aggressivo)':''}`,
+            action:'Citofluorimetria su aspirato/sangue periferico, marcatori addizionali (BCL2/BCL6, MUM1 per B-cell; TIA-1/GrB per T-cell), NGS TCR/IGH.', severity:sev });
+    }
+
+    if (data.cd138==='high') {
+        const lightChain = data.kappa_lambda === 'severe' || data.kappa_lambda === 'kappa' || data.kappa_lambda === 'lambda';
+        flags.push({ title:'CD138 >10% — plasmacellule aumentate',
+            msg:`CD138 >10%${lightChain?' + light-chain skewing ('+(data.kappa_lambda||'?')+')':''}`,
+            action:'Immunofissazione sierica/urinaria, catene leggere libere, SPEP. Non diagnostico di mieloma senza correlazione clinica e imaging.'+(lightChain?' Light-chain skewing rinforza il sospetto.':''),
+            severity: lightChain ? 1 : 2 });
+    }
+
+    if (data.cytogenetics==='t9_22')
+        flags.push({ title:'t(9;22) — CML', msg:'BCR/ABL positivo — esclude NMC classiche', action:'Classificare come LMC e stadiare la fase. Valutare risposta a TKI.', severity:1 });
+
+    // ── MDS: displasia + citogenetica — dimmer (Fix 3) ──
     const mdsCytoFlag = ['del5q','complex'].includes(data.cytogenetics) ||
                         /monosomia\s*7|del.*7q|-7/i.test(data.cytogenetics_notes||'');
+    const mdsCytoWeak = ['trisomy8','del20q'].includes(data.cytogenetics);
     const mdsDispFlag = data.dysplasia === 'multilineage';
-    if ((mdsDispFlag || mdsCytoFlag) && !(data.blasts_percent !== null && data.blasts_percent >= 20)) {
-        flags.push({ title: 'MDS — ESCLUSIONE RICHIESTA',
-            msg: `${mdsDispFlag?'Displasia multilineare':''}${mdsDispFlag&&mdsCytoFlag?' + ':''}${mdsCytoFlag?'Citogenetica MDS-type ('+data.cytogenetics+(data.cytogenetics_notes?' / '+data.cytogenetics_notes:'')+')':''}`,
-            action: 'WHO 2022: PMF richiede esclusione MDS non solo blast-based. Valutare displasia per linea, ferro/sideroblasti ad anello (SF3B1), pannello NGS MDS.',
-            severity: 2 });
+    const mdsBlastsFlag = data.blasts_percent !== null && data.blasts_percent >= 5 && data.blasts_percent < 20;
+    if (!(data.blasts_percent !== null && data.blasts_percent >= 20)) {
+        if (mdsDispFlag || mdsCytoFlag || mdsBlastsFlag) {
+            const elements = [mdsDispFlag?'Displasia multilineare':'', mdsCytoFlag?`Citogenetica MDS-type (${escHtml(data.cytogenetics)}${data.cytogenetics_notes?' · '+escHtml(data.cytogenetics_notes):''})` :'', mdsBlastsFlag?`Blasti ${data.blasts_percent}%`:''].filter(Boolean);
+            flags.push({ title: 'MDS — esclusione formalmente richiesta',
+                msg: elements.join(' + '),
+                action: 'WHO 2022: PMF richiede esclusione MDS non solo blast-based. Valutare displasia per linea, ferro/sideroblasti ad anello (SF3B1), NGS MDS-panel.',
+                severity: 2 });
+        } else if (mdsCytoWeak) {
+            flags.push({ title: 'Citogenetica aspecifica — MDS non esclusa',
+                msg: `${escHtml(data.cytogenetics)}: anomalia condivisa con MDS e NMC (aspecifica)`,
+                action: 'Trisomia 8 e del(20q) si riscontrano in NMC e MDS. Non usare come marker MDS isolato. Correlare con morfologia e pannello NGS.',
+                severity: 2 });
+        }
     }
+
+    // ── PV post-fibrotica ──
     const hbT = data.sex === 'M' ? 16.5 : 16.0;
     const hbNormal = data.hb !== null && data.hb <= hbT;
     const pvPostF = data.jak2 && data.fibrosis !== null && data.fibrosis >= 2
                     && (hbNormal || data.me_ratio === 'decreased' || data.me_ratio === 'inverted');
     if (pvPostF)
-        flags.push({ title:'PV POST-FIBROTICA (fase esaurita)',
-            msg:`JAK2+ · Fibrosi MF-${data.fibrosis} · Hb${data.hb?' '+data.hb+' g/dL':' N/V'} — eritrocitosi non più evidente`,
-            action:'Verificare Hb/Hct storici. PV in fase fibrotica: escludere prima di classificare come PMF de novo.',
+        flags.push({ title:'PV in fase fibrotica — sospetto',
+            msg:`JAK2+ · Fibrosi MF-${data.fibrosis} · Hb${data.hb !== null?' '+data.hb+' g/dL':' N/V'} — eritrocitosi non più evidente`,
+            action:'Verificare Hb/Hct storici (fase pre-fibrotica). PV in fase fibrotica si classifica come post-PV MF, non PMF de novo. Dato anamnestico ematologico indispensabile.',
             severity:2 });
 
-    // PV MASCHERATA: JAK2+ + panmielosi ma Hb nella norma
+    // ── PV mascherata ──
     const pvMasked = data.jak2 && data.proliferation === 'panmyelosis'
                      && data.hb !== null && data.hb <= hbT;
     if (pvMasked && !pvPostF)
-        flags.push({ title:'PV MASCHERATA — sospetto',
+        flags.push({ title:'PV mascherata — da escludere',
             msg:`JAK2+ · Panmielosi · Hb ${data.hb} g/dL (≤${hbT}) — eritrocitosi relativa?`,
-            action:'Controllare: volume plasmatico, ferro sierico, ferritina. Hb può essere falsamente normale in caso di espansione plasmatica o carenza marziale.',
+            action:'Valutare: volume plasmatico, ferro sierico, ferritina. Hb può essere falsamente normale in espansione plasmatica o carenza marziale (fenomeno noto in PV).',
             severity:2 });
 
     return flags;
 }
 
 // ============================================================================
-// DISCORDANCE DETECTION
+// DISCORDANCE — usa getWHOPrimary (PATCH ranking)
 // ============================================================================
 function detectDiscordance(who, morfo, mol, data) {
     const discordances = [];
-
-    // WHO vs Morfo
-    const whoPrimary = ['pv','et','pre','pmf'].find(k => who[k].dx === 'CONFERMATO' || who[k].dx === 'PROBABILE');
-    const morphoPrimary = morfo.ranked[0][0]; // es. "ET"
+    const whoPrimary = getWHOPrimary(who); // PATCH: ranking, non first-hit
+    const morphoPrimary = morfo.ranked[0][0];
     const morfoMap = { ET:'et', PV:'pv', PrePMF:'pre', PMF:'pmf' };
     const morphoKey = morfoMap[morphoPrimary];
 
     if (whoPrimary && morphoKey && whoPrimary !== morphoKey && morfo.ranked[0][1] > 40) {
         discordances.push({
             title: 'WHO vs Quadro Morfologico',
-            detail: `WHO formale → ${whoPrimary.toUpperCase()} ${who[whoPrimary].dx} · Morfologia → ${morphoPrimary} (punteggio ${morfo.ranked[0][1]})`,
+            detail: `WHO formale → ${whoPrimary.toUpperCase()} ${who[whoPrimary].dx} · Morfologia → ${morphoPrimary} (score ${morfo.ranked[0][1]})`,
             action: getDiscordanceAction(whoPrimary, morphoKey, data)
         });
     }
 
-    // WHO vs Molecolare
     if (data.calr && !data.jak2 && whoPrimary === 'pv') {
         discordances.push({
             title: 'Molecolare vs WHO',
-            detail: 'CALR+ senza JAK2 — incongruente con PV (JAK2 è la mutazione guida della PV nel 95% dei casi)',
+            detail: 'CALR+ senza JAK2 — incongruente con PV (JAK2 mutato in ~95% PV)',
             action: 'Rivalutare criteri morfologici PV. Considerare ET o Pre-PMF CALR-correlata.'
         });
     }
     if (data.jak2 && morfo.ranked[0][0] === 'PMF' && morfo.scores.PV > 40) {
         discordances.push({
-            title: 'JAK2 vs Quadro PMF',
-            detail: `JAK2+ con quadro morfologico PMF predominante (punteggio PMF: ${morfo.scores.PMF}) ma punteggio PV anche alto (${morfo.scores.PV})`,
-            action: 'Escludere PV in fase fibrotica (post-PV MF). Rivalutare Hb/Hct storici.'
+            title: 'JAK2+ in quadro PMF con PV nel differenziale',
+            detail: `JAK2+ · Score PMF: ${morfo.scores.PMF} · Score PV: ${morfo.scores.PV}`,
+            action: 'Escludere PV in fase fibrotica (post-PV MF). Rivalutare Hb/Hct storici: diagnosi pregressa di PV?'
         });
     }
 
-    // Fibrosi critica
     if (data.fibrosis === null && (whoPrimary === 'pre' || whoPrimary === 'pmf' || morphoPrimary === 'PrePMF' || morphoPrimary === 'PMF')) {
         discordances.push({
-            title: 'Fibrosi non valutata',
-            detail: 'La diagnosi suggerita richiede grading MF per la classificazione definitiva',
-            action: 'Rivalutare sezione con colorazione reticolare (Gomori). Dato discriminante Pre-PMF vs PMF overt.'
+            title: 'Fibrosi non valutata — classificazione parziale',
+            detail: 'La diagnosi orientata richiede grading MF per classificazione definitiva Pre-PMF vs PMF overt',
+            action: 'Colorazione reticolare (Gomori/Wilder) su sezione dedicata. Dato discriminante obbligatorio.'
         });
     }
 
@@ -1510,14 +2070,14 @@ function detectDiscordance(who, morfo, mol, data) {
 function getDiscordanceAction(whoKey, morfoKey, data) {
     const pair = `${whoKey}→${morfoKey}`;
     const actions = {
-        'et→pre':  'Rivalutare fibrosi. Aggregazione lieve con MF-1 può anticipare la progressione a Pre-PMF pur soddisfacendo criteri ET. Controllo a 12 mesi.',
-        'et→pmf':  'Fibrosi MF-2/3 in caso WHO-ET: possibile progressione post-ET. Rivalutare storia clinica.',
-        'pre→et':  'Morfologia iperlobulata pura con alta PLT: considerare ET. Pre-PMF richiede atipia franca.',
-        'pre→pmf': 'Morfologia PMF-like ma fibrosi ≤MF-1: classificazione Pre-PMF corretta se criteri WHO soddisfatti.',
-        'pv→et':   'Quadro morfologico ET ma criteri PV soddisfatti: verificare Hb/Hct e EPO.',
-        'pv→pre':  'JAK2+ con aggregazione: escludere PV mascherata con eritrocitosi relativa.',
-        'pmf→et':  'Fibrosi MF-2/3 ma quadro ET: valutare post-ET MF.',
-        'pmf→pre': 'Criteri PMF soddisfatti ma quadro morfologico Pre-PMF: rivalutare fibrosi.'
+        'et→pre':  'Rivalutare fibrosi. Aggregazione lieve con MF-1 può anticipare Pre-PMF. Follow-up a 12 mesi con repeat BOM.',
+        'et→pmf':  'Fibrosi MF-2/3 in caso WHO-ET: possibile progressione post-ET MF. Rivalutare storia clinica e PLT storiche.',
+        'pre→et':  'Morfologia iperlobulata pura con alta PLT: considerare ET. Pre-PMF richiede atipia megacariocitaria franca + contesto midollare.',
+        'pre→pmf': 'Morfologia PMF-like ma fibrosi ≤MF-1: Pre-PMF WHO 2022 se tutti i criteri soddisfatti. Rivalutare fibrosi su sezione multipla.',
+        'pv→et':   'Quadro morfologico ET ma criteri PV soddisfatti: verificare Hb/Hct storici ed EPO.',
+        'pv→pre':  'JAK2+ con aggregazione megacariocitaria: escludere PV mascherata con eritrocitosi relativa.',
+        'pmf→et':  'Fibrosi MF-2/3 ma quadro morfologico ET: valutare post-ET MF (storia PLT pregressa?).',
+        'pmf→pre': 'Criteri WHO PMF soddisfatti ma morfologia Pre-PMF-like: rivalutare grading fibrosi.'
     };
     return actions[pair] || 'Correlazione clinico-patologica multidisciplinare raccomandata.';
 }
@@ -1527,15 +2087,15 @@ function getDiscordanceAction(whoKey, morfoKey, data) {
 // ============================================================================
 function checkMPNU(who, redFlags) {
     if (redFlags.some(f => f.severity === 1)) return null;
-    const allOut = ['pv','et','pre','pmf'].every(k => who[k].dx === 'ESCLUSO' || who[k].dx === 'NON_CONFERMATO');
+    const allOut = ['pv','et','pre','pmf'].every(k => who[k].dx === 'ESCLUSO');
     if (!allOut) return null;
     return {
         recs: [
             'Pannello molecolare esteso: ASXL1, EZH2, TET2, IDH1/2, SRSF2, SF3B1',
             'Escludere cause reattive (infezione, neoplasie solide, farmaci)',
-            'Repeat biopsy se morfologia borderline',
-            'Correlazione ematologica multidisciplinare',
-            'Nota: ICC 2022 può classificare diversamente rispetto a WHO 2022'
+            'Repeat BOM se morfologia borderline o campione subottimale',
+            'Correlazione ematologica multidisciplinare (MDT)',
+            'Nota: ICC 2022 può classificare diversamente rispetto a WHO 2022 per alcune entità'
         ]
     };
 }
@@ -1543,76 +2103,117 @@ function checkMPNU(who, redFlags) {
 // ============================================================================
 // REPORT GENERATOR
 // ============================================================================
-function generateReport(data, who, morfo, mol, discordances, redFlags, mpnu) {
-    const now = data.biopsy_date || new Date().toISOString().slice(0,10);
+function generateReport(data, who, morfo, mol, discordances, redFlags, mpnu, confidence) {
+    const now = data.biopsy_date || new Date().getFullYear();
     let r = `REFERTO ISTOLOGICO — BIOPSIA OSTEOMIDOLLARE\n`;
     r += `${'─'.repeat(60)}\n`;
-    r += `Data: ${now}`;
+    r += `Anno: ${now}`;
     if (data.clinical_question) r += `  |  Quesito: ${data.clinical_question}`;
+    r += `\nModalità: ${data.strict_mode ? 'STRICT WHO 2022' : 'EXPERT BOARD'}`;
     r += `\n${'─'.repeat(60)}\n\n`;
+
     r += `CAMPIONE\n`;
     r += `  Qualità: ${data.biopsy_quality||'N/V'}`;
-    if (data.biopsy_length) r += `  |  Lunghezza: ${data.biopsy_length} mm`;
-    if (data.biopsy_spaces) r += `  |  Spazi: ${data.biopsy_spaces}`;
-    r += `\n\nMORFOLOGIA\n`;
-    r += `  Cellularità: ${data.cellularity_percent||'N/V'}% (${data.cellularity||'N/V'})\n`;
+    if (data.biopsy_length !== null) r += `  |  Lunghezza: ${data.biopsy_length} mm`;
+    if (data.biopsy_spaces !== null) r += `  |  Spazi: ${data.biopsy_spaces}`;
+    r += `\n`;
+    if (data.biopsy_quality === 'inadequate') r += `  ⚠ CAMPIONE INADEGUATO — classificazione max PROBABILE\n`;
+
+    r += `\nMORFOLOGIA\n`;
+    r += `  Cellularità: ${data.cellularity_percent !== null ? data.cellularity_percent+'%' : 'N/V'} (${data.cellularity||'N/V'})\n`;
     r += `  Megacariociti: ${data.megakaryocyte||'N/V'}\n`;
     r += `  Proliferazione: ${data.proliferation||'N/V'}\n`;
-    r += `  Fibrosi: ${data.fibrosis!==null?'MF-'+data.fibrosis:'non valutata'}\n`;
+    r += `  Fibrosi: ${data.fibrosis!==null?'MF-'+data.fibrosis:'non valutata ⚠'}\n`;
     r += `  M/E: ${data.me_ratio||'N/V'}\n`;
     r += `  Blasti: ${data.blasts_percent!==null?data.blasts_percent+'%':'N/V'}\n`;
     r += `  Leucoeritroblastosi: ${data.leukoerythroblastosis?'presente':'non documentata'}\n`;
+    r += `  Displasia: ${data.dysplasia||'N/V'}\n`;
     if (data.morphology_notes) r += `  Note: ${data.morphology_notes}\n`;
+
     r += `\nIMMUNOISTOCHIMICA\n`;
-    r += `  E-caderina: ${data.ecadherin||'N/E'}  M/E: ${data.me_ratio||'N/V'}  Leucoeritroblastosi: ${data.leukoerythroblastosis?'presente':'no'}\n`;
+    r += `  E-caderina: ${data.ecadherin||'N/E'}  M/E: ${data.me_ratio||'N/V'}\n`;
     r += `  MPO: ${data.mpo||'N/E'}  CD15: ${data.cd15||'N/E'}\n`;
     r += `  CD68: ${data.cd68||'N/E'}  CD14: ${data.cd14||'N/E'}  CD163: ${data.cd163||'N/E'}\n`;
     r += `  CD61: ${data.cd61||'N/E'}  CD3: ${data.cd3||'N/E'}  CD20: ${data.cd20||'N/E'}  CD138: ${data.cd138||'N/E'}\n`;
-    const labFields = [data.hb, data.hct, data.plt, data.wbc, data.epo_result, data.ldh_elevated||null];
-    const labPresent = labFields.some(v => v !== null && v !== '' && v !== undefined && v !== false);
-    const labCritical = [data.hb, data.plt, data.wbc].some(v => v !== null && v !== undefined && v !== '');
 
     r += `\nDATI CLINICO-LAB\n`;
+    const labPresent = [data.hb, data.hct, data.plt, data.wbc].some(v => v !== null);
     if (!labPresent) {
-        r += `  ⚠ DATI NON DISPONIBILI AL MOMENTO DELLA REFERTAZIONE\n`;
-        r += `  La classificazione WHO 2022 richiede correlazione con emocromo, molecolare e clinica.\n`;
-        r += `  → Indispensabile confronto clinico-ematologico per diagnosi definitiva.\n`;
+        r += `  ⚠ DATI NON DISPONIBILI — classificazione WHO 2022 parziale\n`;
     } else {
-        if (!labCritical) {
-            r += `  ⚠ Dati clinico-lab parziali — valutazione nel contesto clinico necessaria.\n`;
-        }
-        if (data.hb)  r += `  Hb: ${data.hb} g/dL\n`;
-        if (data.hct) r += `  Hct: ${data.hct}%\n`;
-        if (data.plt) r += `  PLT: ${data.plt}×10⁹/L\n`;
-        if (data.wbc) r += `  WBC: ${data.wbc}×10⁹/L\n`;
+        if (data.hb  !== null) r += `  Hb: ${data.hb} g/dL\n`;
+        if (data.hct !== null) r += `  Hct: ${data.hct}%\n`;
+        if (data.plt !== null) r += `  PLT: ${data.plt}×10⁹/L\n`;
+        if (data.wbc !== null) r += `  WBC: ${data.wbc}×10⁹/L\n`;
         if (data.epo_result) r += `  EPO: ${data.epo_result}\n`;
         if (data.ldh_elevated) r += `  LDH: elevato\n`;
         if (data.splenomegaly) r += `  Splenomegalia: presente\n`;
-        if (data.symptoms) r += `  Sintomi costituzionali: presenti\n`;
     }
-    const muts = [data.jak2&&'JAK2',data.calr&&'CALR',data.mpl&&'MPL',data.triple_neg&&'Triple-negativo',data.mol_not_done&&'Molecolare N/E'].filter(Boolean);
+    const otherClonalText = data.other_clonal_marker_text && data.other_clonal_marker_text.trim();
+    // triple_neg implica tutti testati per definizione — ramo "non tutti testati" irraggiungibile, rimosso
+    const tripleNegLabel = data.triple_neg ? 'Triple-negativo (JAK2/CALR/MPL testati e negativi)' : false;
+    // Fix 2 v3.14: driver_panel_incomplete sempre nel report (coerente con pannello UI), con pos/neg/nd
+    // Fix 1 v3.14: incompletoLabel coerente con pannello UI — silenzioso se driver canonico positivo
+    const canonicalDriverFoundRep = data.jak2 || data.calr || data.mpl;
+    const incompletoLabel = (data.driver_panel_incomplete && !canonicalDriverFoundRep) ? (() => {
+        const pos = [data.jak2_status==='pos'&&'JAK2', data.calr_status==='pos'&&'CALR', data.mpl_status==='pos'&&'MPL'].filter(Boolean);
+        const neg = [data.jak2_status==='neg'&&'JAK2', data.calr_status==='neg'&&'CALR', data.mpl_status==='neg'&&'MPL'].filter(Boolean);
+        const nd  = [data.jak2_status==='not_done'&&'JAK2', data.calr_status==='not_done'&&'CALR', data.mpl_status==='not_done'&&'MPL'].filter(Boolean);
+        return `Pannello incompleto — positivi: ${pos.join('/')||'nessuno'}; negativi: ${neg.join('/')||'nessuno'}; non eseguiti: ${nd.join('/')||'nessuno'}`;
+    })() : false;
+    const muts = [data.jak2&&'JAK2 V617F+', data.calr&&'CALR mut', data.mpl&&'MPL mut',
+                  tripleNegLabel,
+                  incompletoLabel,
+                  data.other_clonal_marker && otherClonalText && ('Altro clonale: '+otherClonalText),
+                  data.other_clonal_marker && !otherClonalText && '⚠ Altro marcatore clonale selezionato ma non specificato — non conteggiabile',
+                  data.mol_not_done && 'Molecolare N/E'].filter(Boolean);
     if (muts.length) r += `  Molecolare: ${muts.join(', ')}\n`;
     if (data.cytogenetics) r += `  Citogenetica: ${data.cytogenetics}${data.cytogenetics_notes?' ('+data.cytogenetics_notes+')':''}\n`;
-    r += `\nCLASSIFICAZIONE WHO 2022 (Collegio Parallelo)\n`;
+
+    r += `\nCLASSIFICAZIONE WHO 2022 — COLLEGIO PARALLELO\n`;
     r += `${'─'.repeat(60)}\n`;
-    r += `  [WHO Formale]\n`;
+    r += `  AFFIDABILITÀ CLASSIFICAZIONE: ${confidence.level} (${confidence.score}/100)\n`;
+    if (confidence.notes.length) r += `  Limiti: ${confidence.notes.join(', ')}\n`;
+    r += `\n`;
+
+    const whoPrimary = getWHOPrimary(who);
+    const differential = ['pv','et','pre','pmf'].filter(k => k !== whoPrimary && who[k].dx === 'PROBABILE');
+    const missing = [];
+    if (data.fibrosis === null) missing.push('Fibrosi (Gomori)');
+    if (data.mol_not_done) missing.push('Pannello molecolare (JAK2 minimo)');
+    else if (data.driver_panel_incomplete && !(data.jak2 || data.calr || data.mpl)) missing.push('Pannello driver incompleto — completare CALR/MPL/JAK2 mancanti');
+    if (!labPresent) missing.push('Emocromo completo');
+
+    if (whoPrimary) {
+        r += `  DIAGNOSI PRINCIPALE: ${whoPrimary.toUpperCase()} ${who[whoPrimary].dx}\n`;
+    } else {
+        r += `  DIAGNOSI PRINCIPALE: NON CLASSIFICABILE — vedi raccomandazioni\n`;
+    }
+    if (differential.length) r += `  DIFFERENZIALE: ${differential.map(k=>k.toUpperCase()+' (PROBABILE)').join(', ')}\n`;
+    if (missing.length) r += `  DATO MANCANTE CHE CAMBIA LA DIAGNOSI: ${missing.join(', ')}\n`;
+
+    r += `\n  [WHO Formale]\n`;
     r += `    PV:      ${who.pv.dx} (${who.pv.summary})\n`;
     r += `    ET:      ${who.et.dx} (${who.et.summary})\n`;
     r += `    Pre-PMF: ${who.pre.dx} (${who.pre.summary})\n`;
     r += `    PMF:     ${who.pmf.dx} (${who.pmf.summary})\n\n`;
     r += `  [Quadro Morfologico]\n`;
     morfo.ranked.forEach(([k,s]) => { r += `    ${k.padEnd(8)}: ${s}/100\n`; });
-    r += `\n  [Clinico-Molecolare]\n`;
-    if (mol.molBias) r += `    Orientamento molecolare: ${mol.molBias.label} → ${mol.molBias.dx}\n`;
+    if (mol.molBias) r += `\n  [Orientamento molecolare]: ${mol.molBias.label} → ${mol.molBias.dx}\n`;
+
     if (discordances.length) {
-        r += `\nDISCORDANZE TRA PROSPETTIVE\n`;
+        r += `\nDISCORDANZE\n`;
         discordances.forEach(d => { r += `  ⚠ ${d.title}: ${d.detail}\n    → ${d.action}\n`; });
     }
-    if (mpnu) r += `\nCLASSIFICAZIONE: MPN-U — vedi raccomandazioni\n`;
+    if (mpnu) r += `\nCLASSIFICAZIONE: NMC NON CLASSIFICABILE (MPN-U) — vedi raccomandazioni\n`;
     if (redFlags.length) {
         r += `\nRED FLAGS\n`;
-        redFlags.forEach(f => { r += `  🚨 ${f.title}: ${f.msg}\n     → ${f.action}\n`; });
+        redFlags.forEach(f => { r += `  ${f.severity===1?'🚨':'⚠'} ${f.title}: ${f.msg}\n     → ${f.action}\n`; });
     }
+    r += `\n${'─'.repeat(60)}\n`;
+    r += `⚠ DISCLAIMER: Strumento di supporto diagnostico — non sostituisce la diagnosi clinico-patologica\n`;
+    r += `   Classificazione finale: correlazione multidisciplinare con ematologo.\n`;
+    r += `   SC Anatomia Patologica — ASST Fatebenefratelli-Sacco, Milano\n`;
     return r;
 }
 
@@ -1633,10 +2234,19 @@ function critIcon(met) {
     return { cls:'unknown', sym:'·' };
 }
 
-function renderWHOPanel(who) {
+function renderWHOPanel(who, confidence) {
     let h = '';
 
-    // Summary chips
+    // Confidence badge
+    h += `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;margin-bottom:12px;">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.65em;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;">Affidabilità</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.78em;font-weight:700;color:${confidence.color};">${confidence.level}</span>
+        <span style="font-size:0.68em;color:var(--text-muted);">(${confidence.score}/100)</span>
+    </div>`;
+    if (confidence.notes.length) {
+        h += `<div style="font-size:0.72em;color:var(--warning);margin-bottom:10px;font-style:italic;">⚠ ${confidence.notes.join(' · ')}</div>`;
+    }
+
     const entities = [
         { key:'pv',  label:'PV',      dx:who.pv.dx,  summary:who.pv.summary },
         { key:'et',  label:'ET',      dx:who.et.dx,  summary:who.et.summary },
@@ -1646,7 +2256,7 @@ function renderWHOPanel(who) {
     h += '<div class="dx-row">';
     entities.forEach(e => {
         const cls = dxClass(e.dx);
-        const statusLabel = e.dx.replace('CONFERMATO','✓ CONF.').replace('PROBABILE','~ PROB.').replace('ESCLUSO','— EXC.').replace('NON_CONFERMATO','— N/C');
+        const statusLabel = e.dx.replace('CONFERMATO','✓ CONF.').replace('PROBABILE','~ PROB.').replace('ESCLUSO','— ESCL.');
         h += `<div class="dx-item ${cls}">
             <span class="dx-label">${e.label}</span>
             <span class="dx-status">${statusLabel}</span>
@@ -1654,36 +2264,33 @@ function renderWHOPanel(who) {
     });
     h += '</div>';
 
-    // Detail per entità confermata o probabile
-    const active = entities.find(e => e.dx.includes('CONFERMATO') || e.dx.includes('PROBABILE'));
+    // Fix 1: usa getWHOPrimary (ranking solidity + subscore) invece di first-match
+    const activePrimary = getWHOPrimary(who);
+    const active = activePrimary ? entities.find(e => e.key === activePrimary) : null;
     if (active) {
         h += '<div class="criteria-detail">';
-        h += `<div class="criteria-label">${active.label} — ${active.key === 'et' ? 'Criteri' : 'Criteri'}</div>`;
+        h += `<div class="criteria-label">${active.label} — Criteri WHO 2022</div>`;
         const src = who[active.key];
-        const allDetails = active.key === 'et' ? src.details :
-                           active.key === 'pv' ? src.details :
-                           [...(src.majDetails||[]).map(d=>({...d,prefix:'Mag.'})),
-                            ...(src.minDetails||[]).map(d=>({...d,prefix:'Min.'}))];
+        const allDetails = active.key === 'et' || active.key === 'pv' ? src.details :
+                           [...(src.majDetails||[]), ...(src.minDetails||[])];
         allDetails.forEach(d => {
-            const ic = critIcon(d.met !== undefined ? d.met : d.met);
+            const ic = critIcon(d.met);
             h += `<div class="crit-row">
                 <span class="crit-icon ${ic.cls}">${ic.sym}</span>
-                <span>${d.label || d.text || ''}</span>
+                <span>${escHtml(d.label||'')}</span>
             </div>`;
         });
         h += '</div>';
     }
 
-    // ICC warning
     if (who.pre.dx.includes('CONFERMATO') || who.pre.dx.includes('PROBABILE')) {
-        h += `<div class="icc-chip" style="margin-top:10px;">
-            ⚠ Pre-PMF: entità WHO 2022, non formalizzata allo stesso modo in ICC 2022
-        </div>`;
+        h += `<div class="icc-chip" style="margin-top:10px;">⚠ Pre-PMF: entità WHO 2022, non formalizzata in ICC 2022</div>`;
     }
-    if (who.pre.tripleNeg || who.et.dx.includes('PROBABILE')) {
-        h += `<div class="icc-chip">
-            ⚠ Triple-neg: ICC 2022 richiede clonalità alternativa documentata
-        </div>`;
+    // Fix 1 v3.14: chip triple-neg solo se ET ha effettivamente un criterio triple-neg, non per qualsiasi PROBABILE
+    const etTripleNeg  = (who.et.details  || []).some(d => /Triple-neg/.test(d.label));
+    const pmfTripleNeg = (who.pmf.majDetails || []).some(d => /Triple-neg/.test(d.label));
+    if (who.pre.tripleNeg || etTripleNeg || pmfTripleNeg) {
+        h += `<div class="icc-chip">⚠ Triple-neg: ICC 2022 richiede clonalità alternativa documentata</div>`;
     }
 
     return h;
@@ -1708,16 +2315,15 @@ function renderMorfoPanel(morfo) {
     });
     h += '</div>';
 
-    // Top reasoning
     const top = morfo.ranked[0][0];
     const reas = morfo.reasoning[top];
     if (reas && reas.length) {
         h += '<div class="criteria-detail">';
-        h += `<div class="criteria-label">${top} — razionale</div>`;
+        h += `<div class="criteria-label">${top} — razionale morfologico</div>`;
         reas.slice(0,6).forEach(r => {
             const pos = r.p > 0;
             h += `<div class="crit-row">
-                <span class="crit-icon ${pos?'met':'not-met'}">${pos?'+':r.p}</span>
+                <span class="crit-icon ${pos?'met':'not-met'}">${pos?'+'+r.p:r.p}</span>
                 <span>${r.t}</span>
             </div>`;
         });
@@ -1739,15 +2345,50 @@ function renderMolPanel(mol) {
         const cls = item.type === 'pos' ? 'mol-pos' : item.type === 'partial' ? 'mol-partial' : 'mol-neg';
         h += `<div class="mol-item">
             <div>
-                <div style="font-weight:500;color:var(--text);">${item.label}</div>
-                <div style="font-size:0.72em;color:var(--text-muted);margin-top:2px;">${item.note}</div>
+                <div style="font-weight:500;color:var(--text);">${escHtml(item.label)}</div>
+                <div style="font-size:0.72em;color:var(--text-muted);margin-top:2px;">${escHtml(item.note)}</div>
             </div>
-            <div>
-                <span class="mol-badge ${cls}">${item.value}</span>
-                ${item.bias !== '—' ? `<div style="font-size:0.65em;color:var(--text-muted);text-align:right;margin-top:2px;">${item.bias}</div>` : ''}
+            <div style="text-align:right;flex-shrink:0;margin-left:8px;">
+                <span class="mol-badge ${cls}">${escHtml(item.value)}</span>
+                ${item.bias !== '—' ? `<div style="font-size:0.65em;color:var(--text-muted);margin-top:2px;">${escHtml(item.bias)}</div>` : ''}
             </div>
         </div>`;
     });
+    return h;
+}
+
+// ============================================================================
+// HIERARCHY OUTPUT
+// ============================================================================
+function renderHierarchy(who, morfo, data) {
+    const whoPrimary = getWHOPrimary(who);
+    const differential = ['pv','et','pre','pmf']
+        .filter(k => k !== whoPrimary && (who[k].dx === 'PROBABILE'))
+        .map(k => k.toUpperCase() + ' (PROBABILE)');
+
+    const missing = [];
+    if (data.fibrosis === null) missing.push('Fibrosi (Gomori) — discriminante Pre-PMF/PMF/ET');
+    if (data.mol_not_done) missing.push('JAK2/CALR/MPL — obbligatorio per WHO (altro clonale non sostituisce)');
+    else if (data.driver_panel_incomplete && !(data.jak2 || data.calr || data.mpl)) missing.push('Pannello driver incompleto — testare i driver mancanti');
+    if (data.hb === null && data.hct === null) missing.push('Hb/Hct — per criteri PV');
+    if (data.plt === null) missing.push('PLT — per criteri ET');
+
+    let h = `<div class="dx-hierarchy">
+        <div class="dx-hierarchy-title">◈ Gerarchia Diagnostica</div>`;
+
+    if (whoPrimary) {
+        const whoLabel = {pv:'Policitemia Vera', et:'Trombocitemia Essenziale', pre:'Pre-Mielofibrosi', pmf:'Mielofibrosi Primaria'}[whoPrimary];
+        h += `<div class="dx-primary">→ <span>${whoLabel}</span> ${who[whoPrimary].dx}</div>`;
+    } else {
+        h += `<div class="dx-primary" style="color:var(--discord);">→ <span style="color:var(--discord);">Non classificabile</span></div>`;
+    }
+    if (differential.length) {
+        h += `<div class="dx-differential">Differenziale: ${differential.join(', ')}</div>`;
+    }
+    if (missing.length) {
+        h += `<div class="dx-missing">⚠ Dato mancante: ${missing.join(' · ')}</div>`;
+    }
+    h += `</div>`;
     return h;
 }
 
@@ -1776,14 +2417,15 @@ function analyzeCase() {
         }
     }
 
-    const data     = collectData();
-    const who      = runWHOFormal(data);
-    const morfo    = runPatternMorfo(data);
-    const mol      = runClinMol(data);
-    const redFlags = detectRedFlags(data);
-    const discords = detectDiscordance(who, morfo, mol, data);
-    const mpnu     = checkMPNU(who, redFlags);
-    const report   = generateReport(data, who, morfo, mol, discords, redFlags, mpnu);
+    const data       = collectData();
+    const who        = runWHOFormal(data);
+    const morfo      = runPatternMorfo(data);
+    const mol        = runClinMol(data);
+    const redFlags   = detectRedFlags(data);
+    const discords   = detectDiscordance(who, morfo, mol, data);
+    const mpnu       = checkMPNU(who, redFlags);
+    const confidence = computeConfidence(data, who, morfo); // PATCH: confidence score
+    const report     = generateReport(data, who, morfo, mol, discords, redFlags, mpnu, confidence);
 
     let html = '';
 
@@ -1791,10 +2433,10 @@ function analyzeCase() {
     if (redFlags.length) {
         html += '<div class="redflag-area">';
         redFlags.forEach(f => {
-            html += `<div class="redflag-item">
-                <div class="redflag-title">🚨 ${f.title}</div>
-                <div class="redflag-msg">${f.msg}</div>
-                <div class="redflag-action">→ ${f.action}</div>
+            html += `<div class="redflag-item severity-${f.severity}">
+                <div class="redflag-title">${f.severity===1?'🚨':'⚠'} ${escHtml(f.title)}</div>
+                <div class="redflag-msg">${escHtml(f.msg)}</div>
+                <div class="redflag-action">→ ${escHtml(f.action)}</div>
             </div>`;
         });
         html += '</div>';
@@ -1805,10 +2447,10 @@ function analyzeCase() {
         html += `<div class="discord-banner">
             <div class="discord-header">
                 <span class="discord-icon">⚡</span>
-                <span class="discord-title">Discordanza — ${d.title}</span>
+                <span class="discord-title">Discordanza — ${escHtml(d.title)}</span>
             </div>
-            <div class="discord-detail">${d.detail}</div>
-            <span class="discord-action">→ ${d.action}</span>
+            <div class="discord-detail">${escHtml(d.detail)}</div>
+            <span class="discord-action">→ ${escHtml(d.action)}</span>
         </div>`;
     });
 
@@ -1822,39 +2464,45 @@ function analyzeCase() {
         </div>`;
     }
 
-    // Missing fibrosis warning
+    // PATCH 4: Fibrosi warning
     if (data.fibrosis === null) {
         html += `<div class="discord-banner" style="border-color:#fcd34d;background:#fffbeb;">
             <div class="discord-header">
                 <span class="discord-icon">⚠</span>
-                <span class="discord-title" style="color:var(--warning);">Fibrosi non valutata</span>
+                <span class="discord-title" style="color:var(--warning);">Fibrosi non valutata — classificazione limitata</span>
             </div>
-            <div class="discord-detail">La fibrosi è il criterio discriminante principale tra Pre-PMF, PMF overt ed ET. Senza grading MF la classificazione è parziale.</div>
-            <span class="discord-action" style="color:var(--warning);background:#fef9c3;">→ Colorazione reticolare (Gomori) raccomandata</span>
+            <div class="discord-detail">Fibrosi reticolare (MF-grading) è il criterio discriminante obbligatorio tra ET, Pre-PMF e PMF overt.<br>Senza Gomori/Wilder: nessuna classificazione PMF/Pre-PMF definitiva. ET non confermabile (esclusione MF-2 non documentata).</div>
+            <span class="discord-action" style="color:var(--warning);background:#fef9c3;">→ Colorazione reticolare (Gomori) necessaria per classificazione definitiva</span>
         </div>`;
     }
 
-    // Missing lab warning
-    const labPresent = [data.hb, data.hct, data.plt, data.wbc].some(v => v !== null && v !== undefined && v !== '');
-    if (!labPresent) {
-        html += `<div class="discord-banner" style="border-color:#d97706;background:#fffbeb;">
+    // PATCH 2: Campione warning
+    if (data.biopsy_quality === 'inadequate') {
+        html += `<div class="discord-banner" style="border-color:#dc2626;background:#fef2f2;">
             <div class="discord-header">
-                <span class="discord-icon">⚠</span>
-                <span class="discord-title" style="color:#d97706;">Dati clinico-lab non disponibili</span>
+                <span class="discord-icon">🚫</span>
+                <span class="discord-title" style="color:var(--danger);">Campione inadeguato — classificazione non definitiva</span>
             </div>
-            <div class="discord-detail">La classificazione WHO 2022 richiede correlazione con emocromo completo, dati molecolari e clinica. La valutazione morfologica isolata è necessariamente parziale.</div>
-            <span class="discord-action" style="color:#d97706;background:#fef3c7;">→ Indispensabile confronto clinico-ematologico per diagnosi definitiva</span>
+            <div class="discord-detail">Cilindro &lt;10 mm o rappresentatività insufficiente. Nessuna classificazione WHO "CONFERMATA" possibile. Tutti gli output sono stati declassificati a PROBABILE.</div>
+            <span class="discord-action" style="color:var(--danger);background:#fee2e2;">→ Repeat BOM raccomandata se clinicamente indicato</span>
         </div>`;
-    } else if (![data.hb, data.plt, data.wbc].every(v => v !== null && v !== undefined && v !== '')) {
-        html += `<div class="discord-banner" style="border-color:#d97706;background:#fffbeb;">
-            <div class="discord-header">
-                <span class="discord-icon">◐</span>
-                <span class="discord-title" style="color:#d97706;">Dati clinico-lab parziali</span>
-            </div>
-            <div class="discord-detail">Alcuni parametri chiave (Hb, PLT, WBC) non sono stati inseriti. La classificazione è orientativa.</div>
-            <span class="discord-action" style="color:#d97706;background:#fef3c7;">→ Valutazione nel contesto clinico completo</span>
-        </div>`;
+    } else {
+        // Lab warning (solo se qualità OK o subottimale)
+        const labPresent = [data.hb, data.hct, data.plt, data.wbc].some(v => v !== null);
+        if (!labPresent) {
+            html += `<div class="discord-banner" style="border-color:#d97706;background:#fffbeb;">
+                <div class="discord-header">
+                    <span class="discord-icon">⚠</span>
+                    <span class="discord-title" style="color:#d97706;">Dati clinico-lab non disponibili</span>
+                </div>
+                <div class="discord-detail">Classificazione WHO 2022 richiede correlazione con emocromo completo. Valutazione morfologica isolata è necessariamente parziale.</div>
+                <span class="discord-action" style="color:#d97706;background:#fef3c7;">→ Indispensabile confronto clinico-ematologico per diagnosi definitiva</span>
+            </div>`;
+        }
     }
+
+    // Hierarchy output (PATCH: gerarchia invece di diagnosi singola)
+    html += renderHierarchy(who, morfo, data);
 
     // Tri-modal grid
     html += '<div class="board-title">◈ Collegio Ematologico — Tre Prospettive Parallele</div>';
@@ -1864,7 +2512,7 @@ function analyzeCase() {
                 <div class="modal-dot"></div>
                 <span class="modal-title">WHO 2022 Formale</span>
             </div>
-            ${renderWHOPanel(who)}
+            ${renderWHOPanel(who, confidence)}
         </div>
         <div class="modal-panel morfo-panel">
             <div class="modal-header">
@@ -1882,27 +2530,45 @@ function analyzeCase() {
         </div>
     </div>`;
 
-    // Report
+    // Report — PLACEHOLDER sicuro, testo iniettato via textContent dopo render (Fix XSS)
     html += `<div class="report-section">
         <div class="report-header">
             <span class="report-header-title">◈ Referto Strutturato</span>
             <button class="copy-btn" onclick="copyReport()">⎘ Copia</button>
         </div>
-        <div class="report-body" id="report-body">${report}</div>
+        <div class="report-body" id="report-body"></div>
     </div>`;
 
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('result-area').style.display = 'block';
     document.getElementById('result-area').innerHTML = html;
+    // Iniezione sicura: textContent non interpreta HTML/JS
+    document.getElementById('report-body').textContent = report;
 }
 
 function copyReport() {
     const text = document.getElementById('report-body').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = document.querySelector('.copy-btn');
-        btn.textContent = '✓ Copiato';
-        setTimeout(() => btn.textContent = '⎘ Copia', 2000);
-    });
+    const btn  = document.querySelector('.copy-btn');
+    const done = () => { btn.textContent = '✓ Copiato'; setTimeout(() => btn.textContent = '⎘ Copia', 2000); };
+    const fail = () => { btn.textContent = '✗ Errore'; setTimeout(() => btn.textContent = '⎘ Copia', 2000); };
+    // Fix 2 v3.14: fallback per file://, policy clipboard restrittive, browser datati
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done).catch(() => {
+            try { legacyCopy(text); done(); } catch(e) { fail(); }
+        });
+    } else {
+        try { legacyCopy(text); done(); } catch(e) { fail(); }
+    }
+}
+function legacyCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (!ok) throw new Error('execCommand fallito');
 }
 
 function resetForm() {
@@ -1916,9 +2582,12 @@ function resetForm() {
     document.getElementById('lab-toggle-icon').textContent = '▾';
     document.getElementById('triple-neg-banner').style.display = 'none';
     document.getElementById('cellularity-hint').textContent = '';
+    document.getElementById('quality-warn').style.display = 'none';
+    document.getElementById('other-clonal-expand').style.display = 'none';
     document.getElementById('empty-state').style.display = 'flex';
     document.getElementById('result-area').style.display = 'none';
     document.getElementById('result-area').innerHTML = '';
+    updateStrictLabel();
 }
 </script>
 </body>
