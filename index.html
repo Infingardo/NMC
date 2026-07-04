@@ -1,9 +1,20 @@
+<!--
+    CHANGELOG
+    v3.16 (audit di correttezza clinica)
+      - FIX: criterio di conferma PV (funzione runWHOFormal, criteri WHO-HAEM5 2022) —
+        la diagnosi "CONFERMATO" richiedeva un conteggio generico di 2 criteri maggiori
+        su 3 qualsiasi (es. Hb/Hct + JAK2, senza biopsia compatibile), mentre il WHO 2022
+        richiede o tutti e 3 i maggiori, o specificamente i maggiori 1 (Hb/Hct) + 2
+        (biopsia midollare) insieme al criterio minore (EPO). Vedi commento inline
+        "FIX v3.16 — BUG-01" nel codice e bug_report.md per il dettaglio dell'audit.
+      Nessuna altra modifica funzionale; UI, UX e struttura del report invariate.
+-->
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMC Diagnostic Tool v3.15 — Collegio Ematologico</title>
+    <title>NMC Diagnostic Tool v3.16 — Collegio Ematologico</title>
     <link href="./vendor/fonts/fonts.css" rel="stylesheet">
     <style>
         :root {
@@ -676,7 +687,7 @@
             <input type="checkbox" id="strict-mode" onchange="updateStrictLabel()">
             <label for="strict-mode" id="strict-label">EXPERT BOARD</label>
         </div>
-        <span class="version-chip">v3.15</span>
+        <span class="version-chip">v3.16</span>
     </div>
 </div>
 
@@ -1392,7 +1403,12 @@ function runWHOFormal(data) {
     pvDetails.push({ met: epoMin ? true : (data.epo_result ? false : null), label: `EPO${data.epo_result ? ': '+data.epo_result : ': N/E'}` });
     if (epoMin) pvMin++;
 
-    let pvDx = (pvMaj >= 3) || (pvMaj >= 2 && pvMin >= 1) ? 'CONFERMATO' : 'ESCLUSO';
+    // FIX v3.16 — BUG-01: WHO 2022 richiede TUTTI e 3 i maggiori, oppure SPECIFICAMENTE
+    // i maggiori 1 (Hb/Hct) + 2 (biopsia) + il minore (EPO). Un conteggio generico
+    // pvMaj>=2 ammetteva impropriamente anche la combinazione 1+3 (Hb/Hct + JAK2) o 2+3
+    // senza il dato bioptico, non prevista dai criteri WHO-HAEM5 2022.
+    const pv12 = pvHb && pvBxMet; // primi due criteri maggiori specifici (Hb/Hct + biopsia)
+    let pvDx = (pvMaj >= 3) || (pv12 && pvMin >= 1) ? 'CONFERMATO' : 'ESCLUSO';
 
     let pvDeclassNote = null;
     if (cmlF && pvDx === 'CONFERMATO') {

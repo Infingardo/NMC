@@ -101,6 +101,18 @@ Invariata rispetto a v3.14. Motore WHO (`runWHOFormal`) basato solo su `data`; g
 | v3.13 | `etDeclassNote`; ramo morto rimosso; chip triple-neg esteso a PMF |
 | v3.14 | Riga "campione inadeguato" nei details di PV/Pre-PMF/PMF; clipboard fallback |
 | **v3.15** | **Referto per serie emopoietiche (eritroide → mieloide → megacariocitaria → blastica → linfoide → plasmacellule → fibrosi) + DIAGNOSI + COMMENTO; MAP_FIBROSIS corretto sec. Thiele 2005 / WHO-HAEM5 2022 (MF-1 con intersezioni); legenda UI fibrosi riallineata** |
+| **v3.16** | **Audit correttezza clinica — BUG-01: conferma PV. `runWHOFormal` contava 2 maggiori qualsiasi + minore, ammettendo impropriamente Hb/Hct + JAK2 senza biopsia (maggiori 1+3). Corretto: la via "2 maggiori + minore" richiede specificamente i maggiori 1 (Hb/Hct) + 2 (biopsia) — `pv12 = pvHb && pvBxMet`. Nessun'altra modifica funzionale** |
+
+---
+
+## Note aperte / audit
+
+**Deroga bioptica nella conferma di PV — non implementata (candidata v3.17).**
+WHO-HAEM5 2022 / ICC 2022 prevedono che il criterio maggiore 2 (biopsia osteomidollare) *possa non essere richiesto* in presenza di eritrocitosi assoluta sostenuta (♂ Hb >18.5 g/dL / Hct >55.5%; ♀ Hb >16.5 g/dL / Hct >49.5%) quando siano presenti il maggiore 3 (JAK2) e il minore (EPO subnormale). Il tool **non modella** questa deroga: attualmente la PV non è confermabile senza biopsia. Note per l'eventuale implementazione:
+
+- La soglia di deroga è **distinta e più alta** del criterio maggiore 1 standard (♂ Hb >16.5 / Hct >49; ♀ >16.0 / >48): serve una seconda soglia dedicata, `pvHb` non è riutilizzabile.
+- La deroga richiede eritrocitosi **"sostenuta"** (documentata nel tempo): su input singolo il tool non può verificarne la persistenza → eventuale flag di cautela nel referto.
+- **Attribuzione incerta in letteratura**: le fonti secondarie attribuiscono la clausola di bypass bioptico a volte al WHO-HAEM5 2022, a volte specificamente ai criteri **ICC 2022** (alcune fonti notano che WHO-HAEM5 no longer requires RCM assessment, demandando di fatto il bypass all'ICC). Non c'è unanimità. Se implementata, etichettare esplicitamente il ramo come deroga ICC/WHO 2022 e citarne la fonte.
 
 ---
 
@@ -108,6 +120,7 @@ Invariata rispetto a v3.14. Motore WHO (`runWHOFormal`) basato solo su `data`; g
 
 - WHO Classification of Haematolymphoid Tumours, 5th ed. (WHO-HAEM5), 2022 — Khoury JD et al., *Leukemia* 2022;36:1703-1719 (PMID 35732831)
 - Thiele J, Kvasnicka HM, Facchetti F, Franco V, van der Walt J, Orazi A. European consensus on grading bone marrow fibrosis and assessment of cellularity. *Haematologica* 2005;90(8):1128-1132 (PMID 16079113)
+- Arber DA et al. International Consensus Classification of Myeloid Neoplasms and Acute Leukemias (ICC 2022). *Blood* 2022;140(11):1200-1228 (PMID 35767897) — classificazione concorrente; clausola di deroga bioptica PV (cfr. Note aperte)
 
 ---
 
