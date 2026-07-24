@@ -1,4 +1,4 @@
-# NMC Diagnostic Tool — v3.15
+# NMC Diagnostic Tool — v3.16
 **Collegio Diagnostico Parallelo per Neoplasie Mieloidi Croniche (WHO-HAEM5 2022)**
 
 Strumento di supporto decisionale per la classificazione isto-molecolare delle NMC su biopsia osteomidollare. Single-file HTML/JS, zero dipendenze, funziona offline.
